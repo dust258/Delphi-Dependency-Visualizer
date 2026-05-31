@@ -1,0 +1,578 @@
+using DelphiVisualizer.Graph;
+using DelphiVisualizer.Models;
+using DelphiVisualizer.Parser;
+using Microsoft.Web.WebView2.Core;
+using System.Collections.ObjectModel;
+using System.Text.Json;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+
+namespace DelphiVisualizer;
+
+public partial class MainWindow : Window
+{
+    private Dictionary<string, ProjectUnit> _projectUnits = new();
+    private DependencyGraph? _currentGraph;
+    private bool _webViewReady = false;
+    private string? _pendingGraphJson;
+    private string _filterType = "All";
+
+    // Unit search picker state
+    private List<string> _allUnitNames = new();
+    private string _selectedUnit = "";
+    private bool _suppressTextChange = false;
+
+    // Persistence
+    private string? _currentProjectPath;
+    private bool _autoAnalyzeOnReady = false;
+    private static readonly string SettingsPath = System.IO.Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+        "DelphiVisualizer", "settings.json");
+
+    private readonly ObservableCollection<UnitListItem> _allUnitItems = new();
+    private readonly ObservableCollection<UnitListItem> _filteredItems = new();
+
+    public MainWindow()
+    {
+        InitializeComponent();
+        LbUnits.ItemsSource = _filteredItems;
+        _ = InitWebViewAsync();
+        TryRestoreLastSession();
+    }
+
+    // ── Settings persistence ─────────────────────────────────
+
+    private record AppSettings(string ProjectPath, string Unit, int Depth);
+
+    private void SaveSettings()
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(_currentProjectPath)) return;
+            var dir = System.IO.Path.GetDirectoryName(SettingsPath)!;
+            System.IO.Directory.CreateDirectory(dir);
+            var settings = new AppSettings(
+                _currentProjectPath, _selectedUnit, (int)SlDepth.Value);
+            System.IO.File.WriteAllText(SettingsPath,
+                JsonSerializer.Serialize(settings));
+        }
+        catch { }
+    }
+
+    private void TryRestoreLastSession()
+    {
+        try
+        {
+            if (!System.IO.File.Exists(SettingsPath)) return;
+            var settings = JsonSerializer.Deserialize<AppSettings>(
+                System.IO.File.ReadAllText(SettingsPath));
+            if (settings == null || !System.IO.File.Exists(settings.ProjectPath))
+                return;
+
+            SlDepth.Value = settings.Depth > 0 ? settings.Depth : 3;
+            LoadProject(settings.ProjectPath, settings.Unit);
+            // Auto-analyze once the WebView is ready
+            _autoAnalyzeOnReady = !string.IsNullOrEmpty(settings.Unit);
+        }
+        catch { }
+    }
+
+    // ── WebView2 ─────────────────────────────────────────────
+
+    private async Task InitWebViewAsync()
+    {
+        await WebView.EnsureCoreWebView2Async();
+
+        var webFolder = System.IO.Path.Combine(
+            AppDomain.CurrentDomain.BaseDirectory, "Web");
+        WebView.CoreWebView2.SetVirtualHostNameToFolderMapping(
+            "app.local", webFolder, CoreWebView2HostResourceAccessKind.Allow);
+
+        WebView.CoreWebView2.WebMessageReceived += CoreWebView2_WebMessageReceived;
+        WebView.CoreWebView2.Settings.AreDevToolsEnabled = true;
+        WebView.CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = true;
+        WebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
+
+        WebView.Source = new Uri("https://app.local/index.html");
+    }
+
+    private void WebView_NavigationCompleted(object sender,
+        CoreWebView2NavigationCompletedEventArgs e)
+    {
+        if (!e.IsSuccess) return;
+
+        Dispatcher.InvokeAsync(async () =>
+        {
+            await Task.Delay(300);
+            _webViewReady = true;
+            if (_pendingGraphJson != null)
+            {
+                var json = _pendingGraphJson;
+                _pendingGraphJson = null;
+                SendGraphToWebView(json);
+            }
+            // Auto-analyze the restored session once everything is ready
+            if (_autoAnalyzeOnReady && !string.IsNullOrEmpty(_selectedUnit))
+            {
+                _autoAnalyzeOnReady = false;
+                AnalyzeDependencies(_selectedUnit);
+            }
+        });
+    }
+
+    private void CoreWebView2_WebMessageReceived(object? sender,
+        CoreWebView2WebMessageReceivedEventArgs e)
+    {
+        try
+        {
+            // WebMessageAsJson may be a quoted string if JS used postMessage(JSON.stringify(...))
+            var raw = e.WebMessageAsJson;
+            if (raw.StartsWith('"'))
+                raw = JsonSerializer.Deserialize<string>(raw) ?? raw;
+
+            var msg = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(raw);
+            if (msg == null) return;
+
+            var type = msg.GetValueOrDefault("type").GetString();
+
+            if (type == "log")
+            {
+                var logMsg = msg.GetValueOrDefault("msg").GetString() ?? "";
+                var line = $"[{DateTime.Now:HH:mm:ss.fff}] {logMsg}";
+                System.IO.File.AppendAllText(@"C:\temp\graph-log.txt", line + "\n");
+                return;
+            }
+
+            if (type == "screenshot")
+            {
+                var shotName = msg.TryGetValue("name", out var nm) ? nm.GetString() : null;
+                var file = string.IsNullOrEmpty(shotName)
+                    ? @"C:\temp\webview.png"
+                    : $@"C:\temp\{shotName}.png";
+                Dispatcher.Invoke(async () =>
+                {
+                    try
+                    {
+                        using var fs = new System.IO.FileStream(file, System.IO.FileMode.Create);
+                        await WebView.CoreWebView2.CapturePreviewAsync(
+                            CoreWebView2CapturePreviewImageFormat.Png, fs);
+                    }
+                    catch { }
+                });
+                return;
+            }
+
+            Dispatcher.Invoke(() =>
+            {
+                if (type == "nodeClick")
+                {
+                    var nodeId = msg.GetValueOrDefault("id").GetString();
+                    if (!string.IsNullOrEmpty(nodeId))
+                        SelectUnitInSidebar(nodeId);
+                }
+            });
+        }
+        catch { }
+    }
+
+    // ── Project loading ──────────────────────────────────────
+
+    private void BtnOpen_Click(object sender, RoutedEventArgs e)
+    {
+        var dlg = new Microsoft.Win32.OpenFileDialog
+        {
+            Title = "Delphi-Projekt öffnen",
+            Filter = "Delphi-Projekt (*.dpr)|*.dpr",
+            DefaultExt = ".dpr"
+        };
+        if (dlg.ShowDialog() != true) return;
+        LoadProject(dlg.FileName);
+    }
+
+    private void LoadProject(string dprPath, string? preferUnit = null)
+    {
+        try
+        {
+            SetStatus("Lade Projekt…");
+            _currentProjectPath = dprPath;
+            _projectUnits = DprParser.Parse(dprPath);
+            NodeClassifier.ClassifyAll(_projectUnits);
+
+            _allUnitNames = _projectUnits.Keys
+                .OrderBy(k => k, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            SetUnitPickerItems(_allUnitNames);
+
+            // Pre-select preferred unit if valid, else first
+            if (!string.IsNullOrEmpty(preferUnit) && _projectUnits.ContainsKey(preferUnit))
+                SelectUnit(preferUnit);
+            else if (_allUnitNames.Count > 0)
+                SelectUnit(_allUnitNames[0]);
+
+            TbUnitSearch.IsEnabled = true;
+            SlDepth.IsEnabled = true;
+            BtnAnalyze.IsEnabled = _allUnitNames.Count > 0;
+            SetStatus($"{_projectUnits.Count} Units — {System.IO.Path.GetFileName(dprPath)}");
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Fehler beim Laden:\n{ex.Message}",
+                "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
+            SetStatus("Fehler beim Laden");
+        }
+    }
+
+    // ── Unit Search Picker ───────────────────────────────────
+
+    private void SetUnitPickerItems(IEnumerable<string> items)
+    {
+        LbUnitPicker.ItemsSource = items.ToList();
+    }
+
+    private void SelectUnit(string name)
+    {
+        _selectedUnit = name;
+        _suppressTextChange = true;
+        TbUnitSearch.Text = name;
+        _suppressTextChange = false;
+    }
+
+    private void TbUnitSearch_GotFocus(object sender, RoutedEventArgs e)
+    {
+        UnitPickerBorder.BorderBrush = new SolidColorBrush(
+            (Color)ColorConverter.ConvertFromString("#64B5F6"));
+        TbUnitSearch.SelectAll();
+        ShowFilteredDropdown(TbUnitSearch.Text);
+    }
+
+    private void TbUnitSearch_LostFocus(object sender, RoutedEventArgs e)
+    {
+        UnitPickerBorder.BorderBrush = new SolidColorBrush(
+            (Color)ColorConverter.ConvertFromString("#2A3A60"));
+
+        // Restore last valid selection if text doesn't match a known unit
+        Dispatcher.InvokeAsync(() =>
+        {
+            if (!UnitPopup.IsOpen)
+                RestoreSelection();
+        });
+    }
+
+    private void TbUnitSearch_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (_suppressTextChange) return;
+        ShowFilteredDropdown(TbUnitSearch.Text);
+    }
+
+    private void ShowFilteredDropdown(string query)
+    {
+        if (_allUnitNames.Count == 0) return;
+
+        var q = query.Trim();
+        var filtered = string.IsNullOrEmpty(q)
+            ? _allUnitNames
+            : _allUnitNames
+                .Where(n => n.Contains(q, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(n => {
+                    // Exact start matches come first
+                    if (n.StartsWith(q, StringComparison.OrdinalIgnoreCase)) return 0;
+                    return 1;
+                })
+                .ThenBy(n => n, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+        SetUnitPickerItems(filtered);
+        UnitPopup.IsOpen = filtered.Count > 0;
+    }
+
+    private void TbUnitSearch_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        switch (e.Key)
+        {
+            case Key.Down:
+                if (UnitPopup.IsOpen && LbUnitPicker.Items.Count > 0)
+                {
+                    LbUnitPicker.SelectedIndex = 0;
+                    LbUnitPicker.Focus();
+                }
+                e.Handled = true;
+                break;
+
+            case Key.Enter:
+                var first = LbUnitPicker.Items.OfType<string>().FirstOrDefault();
+                if (first != null) ConfirmSelection(first);
+                e.Handled = true;
+                break;
+
+            case Key.Escape:
+                UnitPopup.IsOpen = false;
+                RestoreSelection();
+                e.Handled = true;
+                break;
+        }
+    }
+
+    private void LbUnitPicker_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        switch (e.Key)
+        {
+            case Key.Enter:
+                if (LbUnitPicker.SelectedItem is string sel)
+                    ConfirmSelection(sel);
+                e.Handled = true;
+                break;
+
+            case Key.Escape:
+                UnitPopup.IsOpen = false;
+                RestoreSelection();
+                TbUnitSearch.Focus();
+                e.Handled = true;
+                break;
+
+            case Key.Up:
+                if (LbUnitPicker.SelectedIndex == 0)
+                {
+                    TbUnitSearch.Focus();
+                    e.Handled = true;
+                }
+                break;
+        }
+    }
+
+    private void LbUnitPicker_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (LbUnitPicker.SelectedItem is string name)
+            ConfirmSelection(name);
+    }
+
+    private void UnitPopup_Opened(object sender, EventArgs e)
+    {
+        // Scroll selected item into view
+        if (!string.IsNullOrEmpty(_selectedUnit))
+        {
+            var idx = (LbUnitPicker.ItemsSource as List<string>)
+                ?.IndexOf(_selectedUnit) ?? -1;
+            if (idx >= 0)
+            {
+                LbUnitPicker.SelectedIndex = idx;
+                LbUnitPicker.ScrollIntoView(LbUnitPicker.SelectedItem);
+            }
+        }
+    }
+
+    private void ConfirmSelection(string name)
+    {
+        SelectUnit(name);
+        UnitPopup.IsOpen = false;
+        BtnAnalyze.IsEnabled = true;
+        TbUnitSearch.Focus();
+    }
+
+    private void RestoreSelection()
+    {
+        if (!string.IsNullOrEmpty(_selectedUnit))
+            SelectUnit(_selectedUnit);
+        else if (_allUnitNames.Count > 0)
+            SelectUnit(_allUnitNames[0]);
+    }
+
+    // ── Analysis ─────────────────────────────────────────────
+
+    private void BtnAnalyze_Click(object sender, RoutedEventArgs e)
+    {
+        UnitPopup.IsOpen = false;
+        var unit = TbUnitSearch.Text.Trim();
+        if (string.IsNullOrEmpty(unit)) return;
+
+        // Accept only known units
+        if (!_projectUnits.ContainsKey(unit))
+        {
+            var match = _allUnitNames.FirstOrDefault(
+                n => n.Equals(unit, StringComparison.OrdinalIgnoreCase));
+            if (match == null) return;
+            unit = match;
+        }
+
+        SelectUnit(unit);
+        AnalyzeDependencies(unit);
+    }
+
+    private void SlDepth_ValueChanged(object sender,
+        System.Windows.RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (TbDepth == null) return;
+        var v = (int)SlDepth.Value;
+        TbDepth.Text = v >= 10 ? "∞" : v.ToString();
+    }
+
+    private void AnalyzeDependencies(string rootUnit)
+    {
+        SetStatus("Analysiere…");
+        _selectedUnit = rootUnit;
+        SaveSettings();  // remember project + unit + depth for next launch
+        _ = WebView.ExecuteScriptAsync("showLoading('Analysiere Abhängigkeiten…')");
+
+        var maxDepth = (int)SlDepth.Value >= 10 ? int.MaxValue : (int)SlDepth.Value;
+
+        Task.Run(() =>
+        {
+            var graph = DependencyResolver.Resolve(rootUnit, _projectUnits, maxDepth);
+            var json = GraphBuilder.BuildJson(graph);
+
+            Dispatcher.Invoke(() =>
+            {
+                _currentGraph = graph;
+                BuildSidebarList(graph);
+
+                if (_webViewReady)
+                    SendGraphToWebView(json);
+                else
+                    _pendingGraphJson = json;
+
+                var cycleText = graph.Cycles.Count > 0
+                    ? $" | ⚠ {graph.Cycles.Count} Zyklus/Zyklen" : "";
+                SetStatus(
+                    $"{graph.Units.Count} Units · {graph.Edges.Count} Kanten{cycleText}");
+            });
+        });
+    }
+
+    private async void SendGraphToWebView(string json)
+    {
+        await WebView.ExecuteScriptAsync($"loadGraph({json})");
+    }
+
+    // ── Sidebar ──────────────────────────────────────────────
+
+    private void BuildSidebarList(DependencyGraph graph)
+    {
+        _allUnitItems.Clear();
+
+        var cycleNodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var cycle in graph.Cycles)
+            foreach (var n in cycle)
+                cycleNodes.Add(n);
+
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        void AddIfNew(string name)
+        {
+            if (!seen.Add(name)) return;
+            graph.Units.TryGetValue(name, out var unit);
+            var unitType = unit?.UnitType ?? "Unit";
+            var isInCycle = cycleNodes.Contains(name);
+            _allUnitItems.Add(new UnitListItem
+            {
+                Name = name,
+                UnitType = unitType,
+                IsInCycle = isInCycle,
+                Brush = MakeBrush(name, unitType, graph.RootUnit, isInCycle)
+            });
+        }
+
+        AddIfNew(graph.RootUnit);
+        foreach (var edge in graph.Edges)
+        {
+            AddIfNew(edge.Source);
+            AddIfNew(edge.Target);
+        }
+
+        ApplyFilter();
+    }
+
+    private static SolidColorBrush MakeBrush(
+        string name, string unitType, string rootUnit, bool isInCycle)
+    {
+        var hex = isInCycle ? "#FF5252"
+            : name.Equals(rootUnit, StringComparison.OrdinalIgnoreCase) ? "#FF6B6B"
+            : unitType switch
+            {
+                "Form"       => "#4FC3F7",
+                "DataModule" => "#A5D6A7",
+                "Frame"      => "#FFB74D",
+                _            => "#B0BEC5"
+            };
+        return new SolidColorBrush((Color)ColorConverter.ConvertFromString(hex));
+    }
+
+    private void ApplyFilter()
+    {
+        var search = TbSearch.Text?.Trim() ?? "";
+        _filteredItems.Clear();
+
+        var items = _allUnitItems.AsEnumerable();
+
+        if (!string.IsNullOrEmpty(search))
+            items = items.Where(i =>
+                i.Name.Contains(search, StringComparison.OrdinalIgnoreCase));
+
+        if (_filterType == "Cycles")
+            items = items.Where(i => i.IsInCycle);
+        else if (_filterType != "All")
+            items = items.Where(i => i.UnitType == _filterType);
+
+        foreach (var item in items.OrderBy(i => i.Name))
+            _filteredItems.Add(item);
+
+        TbUnitCount.Text = $"{_filteredItems.Count} / {_allUnitItems.Count} Units";
+    }
+
+    private void SelectUnitInSidebar(string nodeId)
+    {
+        var item = _filteredItems.FirstOrDefault(i =>
+            i.Name.Equals(nodeId, StringComparison.OrdinalIgnoreCase));
+        if (item != null)
+        {
+            LbUnits.SelectedItem = item;
+            LbUnits.ScrollIntoView(item);
+        }
+    }
+
+    private void LbUnits_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (LbUnits.SelectedItem is UnitListItem item)
+            _ = WebView.ExecuteScriptAsync($"highlightNode('{item.Name}')");
+    }
+
+    private void TbSearch_TextChanged(object sender, TextChangedEventArgs e)
+        => ApplyFilter();
+
+    private void BtnFilter_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is string tag)
+        {
+            _filterType = tag;
+            ApplyFilter();
+        }
+    }
+
+    // ── Layout / Camera ──────────────────────────────────────
+
+    private void BtnLayered_Click(object sender, RoutedEventArgs e)
+        => _ = WebView.ExecuteScriptAsync("setLayoutMode('layered')");
+
+    private void BtnForce_Click(object sender, RoutedEventArgs e)
+        => _ = WebView.ExecuteScriptAsync("setLayoutMode('force')");
+
+    private void BtnTree_Click(object sender, RoutedEventArgs e)
+        => _ = WebView.ExecuteScriptAsync("setLayoutMode('tree')");
+
+    private void BtnRadial_Click(object sender, RoutedEventArgs e)
+        => _ = WebView.ExecuteScriptAsync("setLayoutMode('radial')");
+
+    private void BtnResetCamera_Click(object sender, RoutedEventArgs e)
+        => _ = WebView.ExecuteScriptAsync("resetCamera()");
+
+    private void SetStatus(string text) => TbStatus.Text = text;
+}
+
+public class UnitListItem
+{
+    public string Name { get; set; } = "";
+    public string UnitType { get; set; } = "Unit";
+    public bool IsInCycle { get; set; }
+    public SolidColorBrush Brush { get; set; } = Brushes.Gray;
+}

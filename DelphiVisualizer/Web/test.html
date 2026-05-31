@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="3d-force-graph.min.js"></script>
+<style>body{margin:0;background:#0A0E1A}</style>
+</head>
+<body>
+<div id="g" style="width:100vw;height:100vh"></div>
+<div id="info" style="position:fixed;top:10px;right:10px;color:#fff;font-family:monospace;font-size:12px;background:rgba(0,0,0,0.7);padding:10px;border-radius:6px"></div>
+<script>
+// Test: nodes with explicit fx/fy/fz — do they render at those positions?
+const nodes = [
+  {id:'Root', val:3, color:'#FF6B6B', fx:0,   fy:0,    fz:0},
+  {id:'A',    val:1, color:'#4FC3F7', fx:100,  fy:-200, fz:0},
+  {id:'B',    val:1, color:'#4FC3F7', fx:-100, fy:-200, fz:0},
+  {id:'C',    val:1, color:'#A5D6A7', fx:200,  fy:-400, fz:0},
+  {id:'D',    val:1, color:'#A5D6A7', fx:0,    fy:-400, fz:0},
+  {id:'E',    val:1, color:'#A5D6A7', fx:-200, fy:-400, fz:0},
+];
+const links = [
+  {source:'Root',target:'A'},{source:'Root',target:'B'},
+  {source:'A',target:'C'},{source:'A',target:'D'},{source:'B',target:'E'}
+];
+
+document.getElementById('info').innerHTML =
+  'Nodes: ' + nodes.length + '<br>' +
+  nodes.map(n => n.id + ': fx=' + n.fx + ' fy=' + n.fy).join('<br>');
+
+const Graph = ForceGraph3D()(document.getElementById('g'))
+  .backgroundColor('#0A0E1A')
+  .nodeColor(n => n.color)
+  .nodeVal(n => n.val)
+  .nodeLabel(n => n.id)
+  .linkColor(() => '#64B5F6')
+  .linkDirectionalArrowLength(5)
+  .graphData({nodes, links});
+
+setTimeout(() => Graph.zoomToFit(800, 40), 1000);
+</script>
+</body>
+</html>

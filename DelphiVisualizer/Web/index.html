@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Delphi Dependency Visualizer</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- 3d-force-graph (lokal, bündelt Three.js) -->
+  <script src="3d-force-graph.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <div id="graph-container"></div>
+  </div>
+
+  <!-- Info Panel (node details) -->
+  <div id="info-panel">
+    <h3 id="ip-name"></h3>
+    <div id="ip-badge" class="type-badge"></div>
+    <div class="info-row"><span>Interface-Uses</span><span id="ip-iface"></span></div>
+    <div class="info-row"><span>Impl.-Uses</span><span id="ip-impl"></span></div>
+    <div class="info-row"><span>Eingehende Deps</span><span id="ip-in"></span></div>
+    <p class="info-filepath" id="ip-path"></p>
+    <div id="ip-cycle" class="cycle-warning" style="display:none">⚠ Teil eines Zyklus</div>
+  </div>
+
+  <!-- Stats -->
+  <div id="stats-overlay">
+    <b id="st-units">0</b> Units &nbsp;·&nbsp;
+    <b id="st-edges">0</b> Edges &nbsp;·&nbsp;
+    <b id="st-cycles">0</b> Zyklen
+  </div>
+
+  <!-- Cycle list -->
+  <div id="cycle-panel">
+    <h4>⚠ Zirkuläre Abhängigkeiten</h4>
+    <div id="cycle-list"></div>
+  </div>
+
+  <!-- Legend -->
+  <div id="legend">
+    <div class="legend-item">
+      <span class="legend-gradient"></span>
+      <span style="color:#607080">wenig genutzt</span>
+      <span style="margin:0 4px;color:#8899BB">→</span>
+      <span style="color:#FF2020">stark genutzt</span>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div id="loading">
+    <div class="spinner"></div>
+    <p id="loading-text">Analysiere Abhängigkeiten…</p>
+  </div>
+
+  <!-- Error display -->
+  <div id="load-error">
+    <div>⚠ Fehler beim Laden der 3D-Bibliothek</div>
+    <code id="load-error-msg"></code>
+    <div style="color:#8899BB;font-size:12px">Drücke F12 für Details in den DevTools</div>
+  </div>
+
+<script src="app.js"></script>
+</body>
+</html>

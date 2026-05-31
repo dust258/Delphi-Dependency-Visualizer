@@ -1,0 +1,224 @@
+<Window x:Class="DelphiVisualizer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        Title="Delphi Dependency Visualizer"
+        Width="1400" Height="860"
+        MinWidth="900" MinHeight="600"
+        WindowStartupLocation="CenterScreen"
+        Background="#0A0E1A">
+
+  <DockPanel>
+
+    <!-- ── Toolbar ─────────────────────────────────────────── -->
+    <Border DockPanel.Dock="Top"
+            Background="#080C18"
+            BorderBrush="#1E2D50"
+            BorderThickness="0,0,0,1"
+            Padding="12,8">
+      <DockPanel>
+        <!-- Logo -->
+        <TextBlock DockPanel.Dock="Left"
+                   Text="⬡ Delphi Visualizer"
+                   Foreground="#64B5F6"
+                   FontSize="14" FontWeight="SemiBold"
+                   VerticalAlignment="Center"
+                   Margin="0,0,20,0"/>
+
+        <!-- Right side: reset + layout -->
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="0,0,0,0">
+          <TextBlock Text="Layout:" Foreground="#8899BB" VerticalAlignment="Center" Margin="0,0,6,0" FontSize="11"/>
+          <Button x:Name="BtnLayered" Content="Ebenen" Style="{StaticResource LayoutButton}"
+                  Click="BtnLayered_Click" Margin="0,0,4,0" ToolTip="Hierarchisches Ebenen-Layout (Standard)"/>
+          <Button x:Name="BtnForce" Content="3D" Style="{StaticResource LayoutButton}"
+                  Click="BtnForce_Click" Margin="0,0,4,0" ToolTip="Räumliche 3D-Schichtung (Tiefe nach hinten)"/>
+          <Button x:Name="BtnTree" Content="Baum" Style="{StaticResource LayoutButton}"
+                  Click="BtnTree_Click" Margin="0,0,4,0" ToolTip="DAG-Baum-Layout"/>
+          <Button x:Name="BtnRadial" Content="Radial" Style="{StaticResource LayoutButton}"
+                  Click="BtnRadial_Click" Margin="0,0,16,0" ToolTip="Radiales Layout"/>
+          <Button Content="↺ Kamera" Style="{StaticResource LayoutButton}"
+                  Click="BtnResetCamera_Click" ToolTip="Kamera zurücksetzen"/>
+        </StackPanel>
+
+        <!-- Center: project + unit selection -->
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+          <Button x:Name="BtnOpen" Content="📂 Projekt öffnen"
+                  Style="{StaticResource ToolbarButton}"
+                  Click="BtnOpen_Click" Margin="0,0,12,0"/>
+
+          <TextBlock Text="Startunit:" Foreground="#8899BB"
+                     VerticalAlignment="Center" Margin="0,0,6,0" FontSize="11"/>
+
+          <!-- Searchable unit picker -->
+          <Grid x:Name="UnitPickerRoot" MinWidth="240" MaxWidth="360" Margin="0,0,12,0"
+                VerticalAlignment="Center">
+            <Border x:Name="UnitPickerBorder"
+                    Background="#101828" BorderBrush="#2A3A60"
+                    BorderThickness="1" CornerRadius="5">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="26"/>
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="TbUnitSearch"
+                         Grid.Column="0"
+                         Background="Transparent"
+                         Foreground="#E0E6F0"
+                         BorderThickness="0"
+                         Padding="8,5"
+                         CaretBrush="#64B5F6"
+                         SelectionBrush="#64B5F660"
+                         FontSize="12"
+                         IsEnabled="False"
+                         VerticalContentAlignment="Center"
+                         TextChanged="TbUnitSearch_TextChanged"
+                         GotFocus="TbUnitSearch_GotFocus"
+                         LostFocus="TbUnitSearch_LostFocus"
+                         PreviewKeyDown="TbUnitSearch_PreviewKeyDown"/>
+                <Path Grid.Column="1" Data="M0,0 L4,5 L8,0"
+                      Stroke="#8899BB" StrokeThickness="1.5"
+                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                      IsHitTestVisible="False"/>
+              </Grid>
+            </Border>
+
+            <!-- Dropdown popup -->
+            <Popup x:Name="UnitPopup"
+                   PlacementTarget="{Binding ElementName=UnitPickerBorder}"
+                   Placement="Bottom" VerticalOffset="2"
+                   AllowsTransparency="True" StaysOpen="False"
+                   Opened="UnitPopup_Opened">
+              <Border Background="#101828" BorderBrush="#2A3A60"
+                      BorderThickness="1" CornerRadius="5"
+                      MinWidth="{Binding ActualWidth, ElementName=UnitPickerBorder}"
+                      MaxHeight="320">
+                <Border.Effect>
+                  <DropShadowEffect Color="#000000" BlurRadius="14"
+                                    ShadowDepth="5" Opacity="0.5"/>
+                </Border.Effect>
+                <ListBox x:Name="LbUnitPicker"
+                         Background="Transparent" BorderThickness="0"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         VirtualizingPanel.IsVirtualizing="True"
+                         ItemContainerStyle="{StaticResource UnitListItem}"
+                         SelectionChanged="LbUnitPicker_SelectionChanged"
+                         PreviewKeyDown="LbUnitPicker_PreviewKeyDown"
+                         Margin="3">
+                  <ListBox.ItemTemplate>
+                    <DataTemplate>
+                      <TextBlock Text="{Binding}" FontSize="12" Foreground="#E0E6F0"/>
+                    </DataTemplate>
+                  </ListBox.ItemTemplate>
+                </ListBox>
+              </Border>
+            </Popup>
+          </Grid>
+
+          <Button x:Name="BtnAnalyze" Content="▶ Analysieren"
+                  Style="{StaticResource ToolbarButton}"
+                  Click="BtnAnalyze_Click"
+                  IsEnabled="False"
+                  Background="#1A3A2A" BorderBrush="#2A5A3A"
+                  Margin="0,0,16,0"/>
+
+          <!-- Depth control -->
+          <TextBlock Text="Tiefe:" Foreground="#8899BB"
+                     VerticalAlignment="Center" Margin="0,0,6,0" FontSize="11"/>
+          <Slider x:Name="SlDepth" Minimum="1" Maximum="10" Value="3"
+                  Width="90" VerticalAlignment="Center"
+                  IsSnapToTickEnabled="True" TickFrequency="1" SmallChange="1"
+                  Foreground="#64B5F6"
+                  ValueChanged="SlDepth_ValueChanged"
+                  IsEnabled="False"/>
+          <TextBlock x:Name="TbDepth" Text="3" Foreground="#64B5F6"
+                     VerticalAlignment="Center" Margin="5,0,0,0" FontSize="12" FontWeight="SemiBold"
+                     MinWidth="14"/>
+          <TextBlock Text="(∞=10)" Foreground="#8899BB"
+                     VerticalAlignment="Center" Margin="4,0,16,0" FontSize="10"/>
+
+          <!-- Status text -->
+          <TextBlock x:Name="TbStatus" Foreground="#8899BB"
+                     VerticalAlignment="Center" Margin="16,0,0,0"
+                     FontSize="11" Text="Kein Projekt geladen"/>
+        </StackPanel>
+      </DockPanel>
+    </Border>
+
+    <!-- ── Main Area ──────────────────────────────────────── -->
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="220" MinWidth="160" MaxWidth="340"/>
+        <ColumnDefinition Width="4"/>
+        <ColumnDefinition Width="*"/>
+      </Grid.ColumnDefinitions>
+
+      <!-- ── Sidebar ──────────────────────────────────────── -->
+      <Border Grid.Column="0"
+              Background="#080C18"
+              BorderBrush="#1E2D50"
+              BorderThickness="0,0,1,0">
+        <DockPanel Margin="8">
+
+          <!-- Search box -->
+          <TextBox x:Name="TbSearch"
+                   DockPanel.Dock="Top"
+                   Style="{StaticResource SearchBox}"
+                   TextChanged="TbSearch_TextChanged"
+                   Margin="0,0,0,6"/>
+
+          <!-- Filter buttons -->
+          <WrapPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+            <Button x:Name="BtnFilterAll" Content="Alle" Style="{StaticResource LayoutButton}"
+                    Click="BtnFilter_Click" Tag="All" Margin="0,0,3,3"/>
+            <Button Content="Form" Style="{StaticResource LayoutButton}"
+                    Click="BtnFilter_Click" Tag="Form"
+                    Foreground="#4FC3F7" Margin="0,0,3,3"/>
+            <Button Content="DM" Style="{StaticResource LayoutButton}"
+                    Click="BtnFilter_Click" Tag="DataModule"
+                    Foreground="#A5D6A7" Margin="0,0,3,3"/>
+            <Button Content="Zyklen" Style="{StaticResource LayoutButton}"
+                    Click="BtnFilter_Click" Tag="Cycles"
+                    Foreground="#FF5252" Margin="0,0,3,3"/>
+          </WrapPanel>
+
+          <!-- Unit count -->
+          <TextBlock x:Name="TbUnitCount" DockPanel.Dock="Top"
+                     Foreground="#8899BB" FontSize="11"
+                     Margin="2,0,0,4" Text=""/>
+
+          <!-- Unit list -->
+          <ListBox x:Name="LbUnits"
+                   Background="Transparent"
+                   BorderThickness="0"
+                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                   VirtualizingPanel.IsVirtualizing="True"
+                   ItemContainerStyle="{StaticResource UnitListItem}"
+                   SelectionChanged="LbUnits_SelectionChanged">
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <StackPanel Orientation="Horizontal">
+                  <Ellipse Width="8" Height="8" Margin="0,0,6,0"
+                           VerticalAlignment="Center"
+                           Fill="{Binding Brush}"/>
+                  <TextBlock Text="{Binding Name}" FontSize="12" VerticalAlignment="Center"/>
+                </StackPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </DockPanel>
+      </Border>
+
+      <!-- ── Splitter ─────────────────────────────────────── -->
+      <GridSplitter Grid.Column="1"
+                    Width="4"
+                    HorizontalAlignment="Stretch"
+                    Background="#1E2D50"
+                    Cursor="SizeWE"/>
+
+      <!-- ── WebView2 ──────────────────────────────────────── -->
+      <wv2:WebView2 x:Name="WebView"
+                    Grid.Column="2"
+                    NavigationCompleted="WebView_NavigationCompleted"/>
+    </Grid>
+  </DockPanel>
+</Window>

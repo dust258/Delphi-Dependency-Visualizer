@@ -181,6 +181,27 @@
                     Foreground="#FF5252" Margin="0,0,3,3"/>
           </WrapPanel>
 
+          <!-- Graph-Filter -->
+          <Border DockPanel.Dock="Top"
+                  BorderBrush="#1E2D50" BorderThickness="0,0,0,1"
+                  Margin="0,0,0,6" Padding="2,2,2,6">
+            <StackPanel>
+              <TextBlock Text="GRAPH-FILTER" Foreground="#607090" FontSize="9"
+                         FontWeight="SemiBold" Margin="0,0,0,5"/>
+              <CheckBox x:Name="CbFormsOnly" Content="Nur Formulare"
+                        Foreground="#E0E6F0" FontSize="11" Margin="0,0,0,5"
+                        Checked="GraphFilter_Changed" Unchecked="GraphFilter_Changed"/>
+              <CheckBox x:Name="CbDirFilter" Content="Nur gleiches Verzeichnis"
+                        Foreground="#E0E6F0" FontSize="11" Margin="0,0,0,5"
+                        Checked="GraphFilter_Changed" Unchecked="GraphFilter_Changed"/>
+              <CheckBox x:Name="CbUsesFiltered" Content="Enthält gefilterte Units"
+                        Foreground="#E0E6F0" FontSize="11" Margin="0,0,0,5"
+                        Checked="GraphFilter_Changed" Unchecked="GraphFilter_Changed"/>
+              <Button Content="Filter zurücksetzen" Style="{StaticResource LayoutButton}"
+                      Click="BtnResetFilter_Click" HorizontalAlignment="Left"/>
+            </StackPanel>
+          </Border>
+
           <!-- Unit count -->
           <TextBlock x:Name="TbUnitCount" DockPanel.Dock="Top"
                      Foreground="#8899BB" FontSize="11"

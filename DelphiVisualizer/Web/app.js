@@ -3,7 +3,13 @@
 let Graph = null;
 let currentData = null;
 let cycleNodeSet = new Set();
-let layoutMode = 'layered'; // default: pre-computed hierarchical
+let layoutMode = 'force';
+
+let selectedNode = null;
+const highlightNodeIds = new Set();
+const highlightLinkSet = new Set();
+
+let visFilter = { formsOnly: false, sameDir: false, usesFiltered: false };
 
 // ── Error / Loading helpers ──────────────────────────────
 
@@ -129,7 +135,7 @@ function seedLayeredPositions(nodes, links, rootId, pin = true) {
 function seedTreePositions(nodes, links, rootId, pin = true) {
   const nodeById = new Map(nodes.map(n => [n.id, n]));
 
-  // Build children map from the expanded tree links
+  // Build children map from expanded tree links
   const childrenOf = new Map(nodes.map(n => [n.id, []]));
   links.forEach(l => {
     const s = l.source?.id ?? l.source;
@@ -147,8 +153,27 @@ function seedTreePositions(nodes, links, rootId, pin = true) {
   };
   computeSize(rootId);
 
-  const LEVEL_SPACING = 300;
-  const RING_RADIUS   = 260; // radius per depth level → cone shape
+  // Pass 1: count nodes per depth (BFS) to compute required radius per level
+  const depthOf = new Map([[rootId, 0]]);
+  const bfsQ = [rootId];
+  while (bfsQ.length) {
+    const id = bfsQ.shift();
+    (childrenOf.get(id) || []).forEach(c => {
+      if (!depthOf.has(c)) { depthOf.set(c, depthOf.get(id) + 1); bfsQ.push(c); }
+    });
+  }
+  const nodesPerDepth = new Map();
+  nodes.forEach(n => {
+    const d = depthOf.get(n.id) ?? 0;
+    nodesPerDepth.set(d, (nodesPerDepth.get(d) || 0) + 1);
+  });
+
+  // Radius: grow with both depth and node count, capped to stay within Three.js range
+  const MIN_ARC     = 20;   // minimum arc per node (units)
+  const BASE_R      = 400;  // minimum radius at depth 1
+  const MAX_R       = 9000; // hard cap — beyond this Three.js camera can't see nodes
+  const radiusAt    = d => Math.min(MAX_R, Math.max(BASE_R * d, ((nodesPerDepth.get(d) || 1) * MIN_ARC) / (2 * Math.PI)));
+  const LEVEL_SPACING = 450;
 
   const setPos = (id, x, y, z, d) => {
     const n = nodeById.get(id);
@@ -160,7 +185,7 @@ function seedTreePositions(nodes, links, rootId, pin = true) {
 
   setPos(rootId, 0, 0, 0, 0);
 
-  // BFS placement: each node owns an angular sector [aFrom, aTo]
+  // Pass 2: BFS placement — each node owns a sector [aFrom, aTo]
   // Children subdivide the sector proportionally by subtree size.
   const queue = [{ id: rootId, depth: 0, aFrom: 0, aTo: 2 * Math.PI }];
   while (queue.length > 0) {
@@ -170,11 +195,11 @@ function seedTreePositions(nodes, links, rootId, pin = true) {
 
     const totalSz = ch.reduce((s, c) => s + (subtreeSize.get(c) || 1), 0);
     const y = -(depth + 1) * LEVEL_SPACING;
-    const r = (depth + 1) * RING_RADIUS;
+    const r = radiusAt(depth + 1);
 
     let aStart = aFrom;
     ch.forEach(childId => {
-      const sz = subtreeSize.get(childId) || 1;
+      const sz    = subtreeSize.get(childId) || 1;
       const aSlice = (sz / totalSz) * (aTo - aFrom);
       const aMid   = aStart + aSlice / 2;
       setPos(childId, r * Math.cos(aMid), y, r * Math.sin(aMid), depth + 1);
@@ -274,7 +299,7 @@ function initGraph() {
       .d3VelocityDecay(0.4)
       .onNodeClick(onNodeClick)
       .onNodeHover(onNodeHover)
-      .onBackgroundClick(() => hideInfoPanel());
+      .onBackgroundClick(() => selectNode(null));
 
     const resize = () => {
       if (Graph) {
@@ -295,20 +320,130 @@ function initGraph() {
 
 function onNodeClick(node) {
   if (!node) return;
-  showInfoPanel(node);
-  const distance = 120;
-  const mag = Math.hypot(node.x || 1, node.y || 1, node.z || 1);
-  const distRatio = 1 + distance / mag;
-  Graph.cameraPosition(
-    { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio },
-    node, 800
-  );
-  postToHost({ type: 'nodeClick', id: node._origId || node.id });
+  selectNode(node);
 }
 
 function onNodeHover(node) {
   document.body.style.cursor = node ? 'pointer' : 'default';
-  if (node) showInfoPanel(node);
+  if (node && !selectedNode) showInfoPanel(node);
+}
+
+// ── Selection & subgraph highlight ──────────────────────
+
+function selectNode(node) {
+  if (!Graph) return;
+  const gd = Graph.graphData();
+  const newId = node?.id ?? null;
+
+  // Toggle deselect on re-clicking the same node
+  if (!node || newId === (selectedNode?.id ?? null)) {
+    selectedNode = null;
+    highlightNodeIds.clear();
+    highlightLinkSet.clear();
+    hideInfoPanel();
+    applyHighlight();
+    return;
+  }
+
+  selectedNode = node;
+  highlightNodeIds.clear();
+  highlightLinkSet.clear();
+  highlightNodeIds.add(newId);
+
+  if (node.isRoot) {
+    // Root connects to everything — add all nodes so nothing gets dimmed
+    gd.nodes.forEach(n => highlightNodeIds.add(n.id));
+  } else {
+    const fwd = new Map(gd.nodes.map(n => [n.id, []]));
+    gd.links.forEach(l => {
+      const sId = typeof l.source === 'object' ? l.source.id : l.source;
+      const tId = typeof l.target === 'object' ? l.target.id : l.target;
+      fwd.get(sId)?.push(tId);
+    });
+
+    // BFS forward: all downstream dependencies, all levels
+    const fq = [newId];
+    while (fq.length) {
+      const id = fq.shift();
+      for (const tid of (fwd.get(id) || [])) {
+        if (!highlightNodeIds.has(tid)) { highlightNodeIds.add(tid); fq.push(tid); }
+      }
+    }
+  }
+
+  // Highlight links whose both endpoints are in the highlighted set
+  gd.links.forEach(l => {
+    const sId = typeof l.source === 'object' ? l.source.id : l.source;
+    const tId = typeof l.target === 'object' ? l.target.id : l.target;
+    if (highlightNodeIds.has(sId) && highlightNodeIds.has(tId)) highlightLinkSet.add(l);
+  });
+
+  showInfoPanel(node);
+  postToHost({ type: 'nodeClick', id: node._origId || node.id });
+  applyHighlight();
+}
+
+// Find the first Mesh with a material inside a THREE.js object/group tree
+function findMesh(obj) {
+  if (!obj) return null;
+  if (obj.isMesh && obj.material) return obj;
+  for (const child of (obj.children || [])) {
+    const m = findMesh(child);
+    if (m) return m;
+  }
+  return null;
+}
+
+function applyHighlight() {
+  if (!Graph) return;
+  const gd = Graph.graphData();
+  const active = selectedNode !== null;
+
+  // Node colors: use Graph API (most reliable — bypasses internal material structure)
+  const selId = active ? selectedNode.id : null;
+  Graph.nodeColor(node => {
+    if (!active) return node.color;
+    const sel = node.id === selId;
+    const lit = highlightNodeIds.has(node.id);
+    return sel ? '#FFFFFF' : (lit ? node.color : '#1A2030');
+  });
+
+  // Resync positions in case nodeColor() rebuilt the THREE.js objects
+  syncMeshes();
+
+  const filterVisible = computeFilterVisible();
+  const hasFilter = filterVisible !== null;
+
+  // Node visibility + scale
+  gd.nodes.forEach(n => {
+    const obj = n.__threeObj;
+    if (!obj) return;
+    const origId = n._origId || n.id;
+    obj.visible = !hasFilter || filterVisible.has(origId);
+    obj.scale.setScalar(active && n.id === selId ? 1.5 : 1.0);
+  });
+
+  // Link visibility: filter AND highlight must both pass
+  gd.links.forEach(l => {
+    const lo = l.__lineObj;
+    if (!lo) return;
+    const sNode = typeof l.source === 'object' ? l.source : _nodeById.get(l.source);
+    const tNode = typeof l.target === 'object' ? l.target : _nodeById.get(l.target);
+    const sOrig = sNode ? (sNode._origId || sNode.id) : null;
+    const tOrig = tNode ? (tNode._origId || tNode.id) : null;
+    const filterOk = !hasFilter || (sOrig && tOrig && filterVisible.has(sOrig) && filterVisible.has(tOrig));
+    const highlightOk = !active || highlightLinkSet.has(l);
+    lo.visible = filterOk && highlightOk;
+    if (lo.material && lo.visible) {
+      const mats = Array.isArray(lo.material) ? lo.material : [lo.material];
+      mats.forEach(m => {
+        m.color.set(active && highlightLinkSet.has(l)
+          ? (l.isCyclic ? '#FF5252' : '#64B5F6')
+          : (l.isCyclic ? '#FF5252' : '#3A557F'));
+        m.needsUpdate = true;
+      });
+    }
+  });
 }
 
 function showInfoPanel(node) {
@@ -338,10 +473,56 @@ function hideInfoPanel() {
   document.getElementById('info-panel').classList.remove('visible');
 }
 
+// ── Graph visibility filter ──────────────────────────────
+
+// Returns Set of origIds that are visible given current visFilter.
+// Two-pass: base filters (formsOnly, sameDir) first, then usesFiltered.
+function computeFilterVisible() {
+  const hasBase = visFilter.formsOnly || visFilter.sameDir;
+  if (!hasBase && !visFilter.usesFiltered) return null; // nothing active
+
+  const rootNode = currentData?.nodes.find(n =>
+    n.id.toLowerCase() === (currentData?.rootUnit || '').toLowerCase());
+  const rootDir = (rootNode?.dir || '').toLowerCase().replace(/\\/g, '/');
+
+  // Step 1: base filter
+  const baseVisible = new Set();
+  (currentData?.nodes || []).forEach(n => {
+    if (visFilter.formsOnly && n.unitType !== 'Form') return;
+    if (visFilter.sameDir) {
+      const nodeDir = (n.dir || '').toLowerCase().replace(/\\/g, '/');
+      if (!rootDir || !nodeDir.startsWith(rootDir)) return;
+    }
+    baseVisible.add(n.id);
+  });
+
+  if (!visFilter.usesFiltered) return baseVisible;
+
+  // Step 2: keep only nodes (from base) that have at least one uses-link
+  // pointing to another node that also passes base filter
+  const links = currentData?.links || [];
+  const result = new Set();
+  baseVisible.forEach(id => {
+    const hasFilteredUses = links.some(l => {
+      const src = l.source?.id ?? l.source;
+      const tgt = l.target?.id ?? l.target;
+      return src.toLowerCase() === id.toLowerCase() && baseVisible.has(tgt);
+    });
+    if (hasFilteredUses) result.add(id);
+  });
+  return result;
+}
+
+window.setVisFilter = function(filter) {
+  Object.assign(visFilter, filter);
+  applyHighlight();
+};
+
 // ── loadGraph (called from C#) ───────────────────────────
 
 window.loadGraph = function(data) {
   hideLoading();
+  visFilter = { formsOnly: false, sameDir: false, usesFiltered: false };
 
   if (!Graph) {
     showError('ForceGraph3D nicht initialisiert — drücke F12 für Details.');
@@ -496,13 +677,16 @@ function expandToTree(nodes, links, rootId) {
   const treeLinks = [];
   let uid = 0;
 
-  function visit(origId, parentTreeId, ancestors) {
-    if (treeNodes.length >= MAX_NODES) return;
-    if (ancestors.has(origId)) return;           // back-edge → cycle, stop here
-    const orig = origById.get(origId);
-    if (!orig) return;
+  // BFS: level-by-level expansion so the cap cuts deepest levels, not first branches
+  const queue = [{ origId: rootId, parentTreeId: null, ancestors: new Set() }];
 
-    const treeId = (parentTreeId === null) ? origId : `${origId}~~${++uid}`;
+  while (queue.length > 0 && treeNodes.length < MAX_NODES) {
+    const { origId, parentTreeId, ancestors } = queue.shift();
+    if (ancestors.has(origId)) continue;         // back-edge → cycle, skip
+    const orig = origById.get(origId);
+    if (!orig) continue;
+
+    const treeId = parentTreeId === null ? origId : `${origId}~~${++uid}`;
     treeNodes.push({ ...orig, id: treeId, _origId: origId });
 
     if (parentTreeId !== null)
@@ -510,16 +694,22 @@ function expandToTree(nodes, links, rootId) {
 
     const next = new Set(ancestors);
     next.add(origId);
-    (fwd.get(origId) || []).forEach(childId => visit(childId, treeId, next));
+    (fwd.get(origId) || []).forEach(childId =>
+      queue.push({ origId: childId, parentTreeId: treeId, ancestors: next })
+    );
   }
 
-  visit(rootId, null, new Set());
   return { nodes: treeNodes, links: treeLinks };
 }
 
 function applyLayout(mode, data) {
   data = data || currentData;
   if (!data) return;
+
+  // Reset selection on layout change (node IDs may change in tree mode)
+  selectedNode = null;
+  highlightNodeIds.clear();
+  highlightLinkSet.clear();
 
   layoutMode = mode;
   let nodes = data.nodes;
@@ -580,8 +770,20 @@ function applyLayout(mode, data) {
 
 window.highlightNode = function(nodeId) {
   if (!Graph) return;
-  const node = Graph.graphData().nodes.find(n => n.id === nodeId);
-  if (node) onNodeClick(node);
+  const nodes = Graph.graphData().nodes;
+
+  // Match by origId to handle tree-mode duplicates (IDs like "unitName~~42")
+  const matches = nodes.filter(n => (n._origId || n.id) === nodeId);
+  if (!matches.length) return;
+
+  // Pick the instance at the shallowest depth (highest level in the hierarchy)
+  const best = matches.reduce((a, b) =>
+    (a.__depth ?? Infinity) <= (b.__depth ?? Infinity) ? a : b);
+
+  // Guard: skip if already selected — prevents 3D-click → sidebar-update → re-trigger loop
+  if (selectedNode?.id === best.id) return;
+
+  selectNode(best);
 };
 
 window.setLayoutMode = function(mode) {

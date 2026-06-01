@@ -549,6 +549,39 @@ public partial class MainWindow : Window
         }
     }
 
+    // ── Graph-Filter ─────────────────────────────────────────
+
+    private bool _suppressFilterChanged = false;
+
+    private void GraphFilter_Changed(object sender, RoutedEventArgs e)
+    {
+        if (_suppressFilterChanged || !_webViewReady) return;
+        SendVisFilter();
+    }
+
+    private void BtnResetFilter_Click(object sender, RoutedEventArgs e)
+    {
+        _suppressFilterChanged = true;
+        CbFormsOnly.IsChecked = false;
+        CbDirFilter.IsChecked = false;
+        CbUsesFiltered.IsChecked = false;
+        _suppressFilterChanged = false;
+        SendVisFilter();
+    }
+
+    private void SendVisFilter()
+    {
+        if (!_webViewReady) return;
+        var formsOnly    = CbFormsOnly.IsChecked    == true ? "true" : "false";
+        var sameDir      = CbDirFilter.IsChecked     == true ? "true" : "false";
+        var usesFiltered = CbUsesFiltered.IsChecked  == true ? "true" : "false";
+        _ = WebView.ExecuteScriptAsync(
+            $"setVisFilter({{\"formsOnly\":{formsOnly},\"sameDir\":{sameDir},\"usesFiltered\":{usesFiltered}}})");
+    }
+
+    private static string EscapeJson(string s) =>
+        s.Replace("\\", "\\\\").Replace("\"", "\\\"");
+
     // ── Layout / Camera ──────────────────────────────────────
 
     private void BtnLayered_Click(object sender, RoutedEventArgs e)

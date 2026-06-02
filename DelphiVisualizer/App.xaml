@@ -51,6 +51,13 @@
       <Setter Property="FontSize" Value="11"/>
     </Style>
 
+    <Style TargetType="Button" x:Key="LayoutButtonActive" BasedOn="{StaticResource LayoutButton}">
+      <Setter Property="Background" Value="#1A3A6A"/>
+      <Setter Property="BorderBrush" Value="#64B5F6"/>
+      <Setter Property="Foreground" Value="#90CAF9"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+
     <Style TargetType="ListBoxItem" x:Key="UnitListItem">
       <Setter Property="Foreground" Value="#C0CCDD"/>
       <Setter Property="Background" Value="Transparent"/>

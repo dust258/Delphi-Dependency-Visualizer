@@ -10,6 +10,8 @@ public partial class OptionsDialog : Window
     public OptionsDialog(int currentMaxNodes)
     {
         InitializeComponent();
+        NativeMethods.EnableDarkTitleBar(this);
+        Icon = AppIconHelper.Get();
         MaxNodes = currentMaxNodes;
         TbMaxNodes.Text = currentMaxNodes.ToString();
         Loaded += (_, _) => { TbMaxNodes.SelectAll(); TbMaxNodes.Focus(); };

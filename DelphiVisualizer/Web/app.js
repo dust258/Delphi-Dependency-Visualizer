@@ -7,10 +7,25 @@ let layoutMode = 'force';
 
 let selectedNode = null;
 const highlightNodeIds = new Set();
-const highlightLinkSet = new Set();
 
 let visFilter = { formsOnly: false, sameDir: false, usesFiltered: false };
 let _maxNodes = 20000;
+
+// ── Web Worker für Layout-Berechnung ────────────────────────
+const _layoutWorker = new Worker('layoutWorker.js');
+_layoutWorker.onerror = ev => {
+  log('Worker-Fehler: ' + ev.message);
+  showError('Layout-Worker konnte nicht geladen werden: ' + ev.message);
+};
+_layoutWorker.onmessage = ev => {
+  if (ev.data.error) {
+    log('Worker-Fehler: ' + ev.data.error);
+    showError('Layout-Fehler im Worker: ' + ev.data.error);
+    hideLoading();
+    return;
+  }
+  _applyLayoutResult(ev.data.mode, ev.data.nodes, ev.data.links);
+};
 
 // ── Error / Loading helpers ──────────────────────────────
 
@@ -288,7 +303,7 @@ function initGraph() {
         <span style="font-size:10px;color:#8899BB">${node.unitType}${node.__depth !== undefined ? ' · Tiefe ' + node.__depth : ''}</span>
         </div>`)
       .nodeColor(node => node.color)
-      .nodeVal(node => node.isRoot ? (node.val ?? 1) : Math.min(node.val ?? 1, 6))
+      .nodeVal(node => node.isRoot ? 1000 : Math.min(node.val ?? 1, 6))
       .nodeRelSize(8)
       .nodeOpacity(1.0)
       .linkColor(link => link.isCyclic ? '#FF5252' : '#3A557F')
@@ -365,7 +380,6 @@ function selectNode(node) {
   if (!node || newId === (selectedNode?.id ?? null)) {
     selectedNode = null;
     highlightNodeIds.clear();
-    highlightLinkSet.clear();
     hideInfoPanel();
     applyHighlight();
     return;
@@ -373,21 +387,26 @@ function selectNode(node) {
 
   selectedNode = node;
   highlightNodeIds.clear();
-  highlightLinkSet.clear();
   highlightNodeIds.add(newId);
 
-  if (node.isRoot) {
-    // Root connects to everything — add all nodes so nothing gets dimmed
+  // Echter Root-Knoten: ID aus currentData (stabil, kein Duplikat-Problem)
+  const realRootId = currentData?.rootUnit ?? null;
+  const isActualRoot = node.id === realRootId;
+
+  if (isActualRoot) {
+    // Root markiert alles
     gd.nodes.forEach(n => highlightNodeIds.add(n.id));
   } else {
     const fwd = new Map(gd.nodes.map(n => [n.id, []]));
+    const rev = new Map(gd.nodes.map(n => [n.id, []]));
     gd.links.forEach(l => {
       const sId = typeof l.source === 'object' ? l.source.id : l.source;
       const tId = typeof l.target === 'object' ? l.target.id : l.target;
       fwd.get(sId)?.push(tId);
+      rev.get(tId)?.push(sId);
     });
 
-    // BFS forward: all downstream dependencies, all levels
+    // BFS vorwärts: alle Abhängigkeiten der ausgewählten Unit
     const fq = [newId];
     while (fq.length) {
       const id = fq.shift();
@@ -395,14 +414,30 @@ function selectNode(node) {
         if (!highlightNodeIds.has(tid)) { highlightNodeIds.add(tid); fq.push(tid); }
       }
     }
-  }
 
-  // Highlight links whose both endpoints are in the highlighted set
-  gd.links.forEach(l => {
-    const sId = typeof l.source === 'object' ? l.source.id : l.source;
-    const tId = typeof l.target === 'object' ? l.target.id : l.target;
-    if (highlightNodeIds.has(sId) && highlightNodeIds.has(tId)) highlightLinkSet.add(l);
-  });
+    // BFS rückwärts: EINEN Weg zur Startunit (echte Root-ID, kein Duplikat)
+    if (realRootId && realRootId !== newId) {
+      const prev = new Map([[newId, null]]);
+      const bq = [newId];
+      outer: while (bq.length) {
+        const id = bq.shift();
+        for (const sid of (rev.get(id) || [])) {
+          if (!prev.has(sid)) {
+            prev.set(sid, id);
+            if (sid === realRootId) {
+              let cur = sid;
+              while (cur !== null) {
+                highlightNodeIds.add(cur);
+                cur = prev.get(cur) ?? null;
+              }
+              break outer;
+            }
+            bq.push(sid);
+          }
+        }
+      }
+    }
+  }
 
   showInfoPanel(node);
   postToHost({ type: 'nodeClick', id: node._origId || node.id });
@@ -449,7 +484,7 @@ function applyHighlight() {
     obj.scale.setScalar(active && n.id === selId ? 1.5 : 1.0);
   });
 
-  // Link visibility: filter AND highlight must both pass
+  // Link visibility: filter AND highlight (node-ID-basiert, nicht objekt-referenz-basiert)
   gd.links.forEach(l => {
     const lo = l.__lineObj;
     if (!lo) return;
@@ -458,12 +493,15 @@ function applyHighlight() {
     const sOrig = sNode ? (sNode._origId || sNode.id) : null;
     const tOrig = tNode ? (tNode._origId || tNode.id) : null;
     const filterOk = !hasFilter || (sOrig && tOrig && filterVisible.has(sOrig) && filterVisible.has(tOrig));
-    const highlightOk = !active || highlightLinkSet.has(l);
-    lo.visible = filterOk && highlightOk;
+    // Highlight-Check über stabile String-IDs statt Objekt-Referenzen
+    const sId = sNode?.id ?? null;
+    const tId = tNode?.id ?? null;
+    const isHighlighted = active && sId && tId && highlightNodeIds.has(sId) && highlightNodeIds.has(tId);
+    lo.visible = filterOk && (!active || isHighlighted);
     if (lo.material && lo.visible) {
       const mats = Array.isArray(lo.material) ? lo.material : [lo.material];
       mats.forEach(m => {
-        m.color.set(active && highlightLinkSet.has(l)
+        m.color.set(isHighlighted
           ? (l.isCyclic ? '#FF5252' : '#64B5F6')
           : (l.isCyclic ? '#FF5252' : '#3A557F'));
         m.needsUpdate = true;
@@ -728,7 +766,7 @@ function seed3DPositions(nodes, links, rootId) {
 // Cycle edges (back-edges within the current DFS path) are dropped.
 window.setMaxNodes = function(n) {
   _maxNodes = Math.max(100, n);
-  if (layoutMode === 'tree' && currentData) applyLayout('tree');
+  if (layoutMode === 'tree' && currentData) applyLayout('tree', currentData);
 };
 
 function expandToTree(nodes, links, rootId) {
@@ -775,64 +813,112 @@ function applyLayout(mode, data) {
   data = data || currentData;
   if (!data) return;
 
-  // Reset selection on layout change (node IDs may change in tree mode)
   selectedNode = null;
   highlightNodeIds.clear();
-  highlightLinkSet.clear();
-
   layoutMode = mode;
-  let nodes = data.nodes;
-  let links = data.links;
 
-  // Tree mode: expand shared nodes so each branch gets its own copy
-  if (mode === 'tree') {
-    const expanded = expandToTree(nodes, links, data.rootUnit);
-    nodes = expanded.nodes;
-    links = expanded.links;
+  showLoading('Berechne Layout…');
+
+  // Sende saubere (Three.js-freie) Kopien an den Worker
+  const workerNodes = data.nodes.map(n => ({
+    id: n.id, name: n.name, color: n.color, val: n.val,
+    unitType: n.unitType, isRoot: n.isRoot || false,
+    filePath: n.filePath || '', dir: n.dir || ''
+  }));
+  const workerLinks = data.links.map(l => ({
+    source: String(l.source?.id ?? l.source),
+    target: String(l.target?.id ?? l.target),
+    kind: l.kind || 'interface',
+    isCyclic: l.isCyclic || false,
+    color: l.color || '#3A557F'
+  }));
+
+  log(`applyLayout mode=${mode} nodes=${workerNodes.length} → Worker`);
+  _layoutWorker.postMessage({
+    mode, nodes: workerNodes, links: workerLinks,
+    rootUnit: data.rootUnit, maxNodes: _maxNodes
+  });
+}
+
+// Wird vom Worker-Callback aufgerufen, nachdem Positionen berechnet wurden
+function _applyLayoutResult(mode, nodes, links) {
+  hideLoading();
+  log(`_applyLayoutResult mode=${mode} nodes=${nodes.length} links=${links.length}`);
+  try {
+    _nodeById = new Map(nodes.map(n => [n.id, n]));
+
+    Graph.dagMode(null);
+    Graph.d3Force('center', null);
+    Graph.d3Force('charge', null);
+    Graph.d3Force('link').strength(0);
+    Graph.cooldownTicks(Infinity);
+    Graph.cooldownTime(15000);
+
+    Graph.graphData({ nodes, links });
+
+    // Stats & overlays
+    const stats = currentData?.stats || {};
+    document.getElementById('st-units').textContent = stats.unitCount ?? nodes.length;
+    document.getElementById('st-edges').textContent = stats.edgeCount ?? links.length;
+    document.getElementById('st-cycles').textContent = stats.cycleCount ?? currentData?.cycles?.length ?? 0;
+    document.getElementById('stats-overlay').classList.add('visible');
+    document.getElementById('legend').classList.add('visible');
+    buildCyclePanel(currentData?.cycles || []);
+
+    // Anzahl der Sync-Frames skaliert mit Knotenanzahl
+    const syncFrames = nodes.length > 10000 ? 60 : nodes.length > 2000 ? 120 : 240;
+
+    setTimeout(() => {
+      try {
+        syncMeshes();
+        optimizeNodeGeometries(); // geteilte Low-Poly-Geometrie für alle Knoten
+        let frames = 0;
+        const tick = () => { syncMeshes(); if (++frames < syncFrames) requestAnimationFrame(tick); };
+        requestAnimationFrame(tick);
+        if (mode === 'tree')       rootTopCamera('y');
+        else if (mode === 'force') rootTopCamera('z');
+        else                       centerCameraOnGraph();
+      } catch(e) {
+        log(`Layout sync ERROR: ${e.message}`);
+      }
+    }, 1200);
+
+  } catch(e) {
+    log(`_applyLayoutResult ERROR: ${e.message}`);
+    showError('Layout-Fehler: ' + e.message);
   }
+}
 
-  log(`applyLayout mode=${mode} nodes=${nodes.length} links=${links.length} cycleNodes=${cycleNodeSet.size}`);
-  _nodeById = new Map(nodes.map(n => [n.id, n]));
-
-  // Pinned layouts: compute positions ourselves, then glue meshes to them.
-  if (mode === 'radial')       seedRadialPositions(nodes, links, data.rootUnit);
-  else if (mode === 'tree')    seedTreePositions(nodes, links, data.rootUnit, true);
-  else if (mode === 'force')   seed3DPositions(nodes, links, data.rootUnit);
-  else                          seedLayeredPositions(nodes, links, data.rootUnit, true);
-
-  // No dagMode. Pins (fx/fy/fz) hold nodes; syncMeshes glues meshes & links.
-  Graph.dagMode(null);
-  Graph.d3Force('center', null);
-  Graph.d3Force('charge', null);
-  Graph.d3Force('link').strength(0);
-  Graph.cooldownTicks(Infinity);
-  Graph.cooldownTime(15000);
-
-  Graph.graphData({ nodes, links });
-
-  const is3D = (mode === 'force' || mode === 'tree');
-  setTimeout(() => {
-    try {
-      syncMeshes();
-      let frames = 0;
-      const tick = () => { syncMeshes(); if (++frames < 240) requestAnimationFrame(tick); };
-      requestAnimationFrame(tick);
-      if (mode === 'tree')       rootTopCamera('y');
-      else if (mode === 'force') rootTopCamera('z');
-      else                       centerCameraOnGraph();
-    } catch (e) {
-      log(`Layout ${mode} ERROR: ${e.message}`);
+// Ersetzt alle Knoten-Sphere-Geometrien durch Low-Poly-Versionen (6×4 Segmente).
+// Pro einzigartigem nodeVal wird exakt eine Geometrie erstellt und geteilt.
+// Radius bleibt korrekt (baked-in wie im Original), aber Dreieckzahl sinkt ~80%.
+function optimizeNodeGeometries() {
+  const nodes = Graph.graphData().nodes;
+  const first = nodes.find(n => n.__threeObj?.geometry?.type?.includes('Sphere'));
+  if (!first) return;
+  const SphereGeo = first.__threeObj.geometry.constructor;
+  const NODE_RS = 8; // nodeRelSize — muss mit .nodeRelSize(8) übereinstimmen
+  const geoByVal = new Map();
+  const getGeo = val => {
+    if (!geoByVal.has(val)) {
+      const r = Math.cbrt(Math.max(0, val)) * NODE_RS;
+      geoByVal.set(val, new SphereGeo(r, 6, 4));
     }
-  }, 1200);
-
-  // Stats & overlays
-  const stats = data.stats || {};
-  document.getElementById('st-units').textContent = stats.unitCount ?? nodes.length;
-  document.getElementById('st-edges').textContent = stats.edgeCount ?? links.length;
-  document.getElementById('st-cycles').textContent = stats.cycleCount ?? data.cycles?.length ?? 0;
-  document.getElementById('stats-overlay').classList.add('visible');
-  document.getElementById('legend').classList.add('visible');
-  buildCyclePanel(data.cycles || []);
+    return geoByVal.get(val);
+  };
+  let n = 0;
+  nodes.forEach(node => {
+    const mesh = node.__threeObj;
+    if (!mesh?.geometry) return;
+    // Root-Knoten: val=1000 → Radius = cbrt(1000)*8 = 10*8 = 80 (≈10× normaler Knoten)
+    const val = node.isRoot ? 1000 : Math.min(node.val ?? 1, 6);
+    const geo = getGeo(val);
+    if (mesh.geometry === geo) return;
+    mesh.geometry.dispose();
+    mesh.geometry = geo;
+    n++;
+  });
+  if (n > 0) log(`Geometry optimized: ${n} nodes, ${geoByVal.size} unique sizes (6×4 low-poly)`);
 }
 
 // ── Public API (called from C#) ──────────────────────────
@@ -935,7 +1021,7 @@ function _camRgt(cam) { const m = cam.matrixWorld.elements; return { x:  m[0], y
   const cam  = Graph.camera();
   const ctrl = typeof Graph.controls === 'function' ? Graph.controls() : null;
   const fast = _keysDown.has('shift');
-  const spd  = fast ? 270 : 90;
+  const spd  = fast ? 135 : 45;
 
   const fwd = _camFwd(cam);
   const rgt = _camRgt(cam);

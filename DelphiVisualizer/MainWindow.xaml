@@ -6,6 +6,7 @@
         Width="1400" Height="860"
         MinWidth="900" MinHeight="600"
         WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
         Background="#0A0E1A">
 
   <DockPanel>

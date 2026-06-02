@@ -331,6 +331,21 @@ kbd {
   text-align: center;
 }
 
+.help-about {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #506070;
+}
+.help-about a {
+  color: #506070;
+  text-decoration: none;
+}
+.help-about a:hover { color: var(--accent); }
+
 #load-error {
   position: absolute;
   inset: 0;

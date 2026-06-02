@@ -39,6 +39,9 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         LbUnits.ItemsSource = _filteredItems;
+        SetActiveLayoutButton(BtnForce);
+        NativeMethods.EnableDarkTitleBar(this);
+        Icon = AppIconHelper.Get();
         _ = InitWebViewAsync();
         TryRestoreLastSession();
     }
@@ -587,17 +590,37 @@ public partial class MainWindow : Window
 
     // ── Layout / Camera ──────────────────────────────────────
 
+    private void SetActiveLayoutButton(Button active)
+    {
+        var activeStyle   = (Style)FindResource("LayoutButtonActive");
+        var defaultStyle  = (Style)FindResource("LayoutButton");
+        foreach (var btn in new[] { BtnLayered, BtnForce, BtnTree, BtnRadial })
+            btn.Style = btn == active ? activeStyle : defaultStyle;
+    }
+
     private void BtnLayered_Click(object sender, RoutedEventArgs e)
-        => _ = WebView.ExecuteScriptAsync("setLayoutMode('layered')");
+    {
+        SetActiveLayoutButton(BtnLayered);
+        _ = WebView.ExecuteScriptAsync("setLayoutMode('layered')");
+    }
 
     private void BtnForce_Click(object sender, RoutedEventArgs e)
-        => _ = WebView.ExecuteScriptAsync("setLayoutMode('force')");
+    {
+        SetActiveLayoutButton(BtnForce);
+        _ = WebView.ExecuteScriptAsync("setLayoutMode('force')");
+    }
 
     private void BtnTree_Click(object sender, RoutedEventArgs e)
-        => _ = WebView.ExecuteScriptAsync("setLayoutMode('tree')");
+    {
+        SetActiveLayoutButton(BtnTree);
+        _ = WebView.ExecuteScriptAsync("setLayoutMode('tree')");
+    }
 
     private void BtnRadial_Click(object sender, RoutedEventArgs e)
-        => _ = WebView.ExecuteScriptAsync("setLayoutMode('radial')");
+    {
+        SetActiveLayoutButton(BtnRadial);
+        _ = WebView.ExecuteScriptAsync("setLayoutMode('radial')");
+    }
 
     private void BtnResetCamera_Click(object sender, RoutedEventArgs e)
         => _ = WebView.ExecuteScriptAsync("resetCamera()");

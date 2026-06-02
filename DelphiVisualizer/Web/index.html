@@ -41,9 +41,42 @@
   <div id="legend">
     <div class="legend-item">
       <span class="legend-gradient"></span>
-      <span style="color:#607080">wenig genutzt</span>
+      <span style="color:#607080">wenig Uses</span>
       <span style="margin:0 4px;color:#8899BB">→</span>
-      <span style="color:#FF2020">stark genutzt</span>
+      <span style="color:#FF2020">viele Uses</span>
+    </div>
+  </div>
+
+  <!-- Help button -->
+  <button id="help-btn" onclick="toggleHelp()" title="Steuerung (?)">?</button>
+
+  <!-- Help modal -->
+  <div id="help-modal" onclick="if(event.target===this)toggleHelp()">
+    <div id="help-content">
+      <button class="help-close" onclick="toggleHelp()">✕</button>
+      <h2>Steuerung</h2>
+
+      <h3>Tastatur — Navigation</h3>
+      <table class="help-table">
+        <tr><td><kbd>W</kbd> / <kbd>S</kbd></td><td>Vorwärts / Rückwärts</td></tr>
+        <tr><td><kbd>A</kbd> / <kbd>D</kbd></td><td>Links / Rechts (seitwärts)</td></tr>
+        <tr><td><kbd>Q</kbd> / <kbd>E</kbd></td><td>Rollen links / rechts</td></tr>
+        <tr><td><kbd>R</kbd> / <kbd>F</kbd></td><td>Aufsteigen / Absenken</td></tr>
+        <tr><td><kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd></td><td>Blickrichtung neigen / schwenken</td></tr>
+        <tr><td><kbd>Shift</kbd> + Taste</td><td>3× Geschwindigkeit</td></tr>
+      </table>
+
+      <h3>Maus</h3>
+      <table class="help-table">
+        <tr><td>Linke Taste + Ziehen</td><td>Orbit (Kamera drehen)</td></tr>
+        <tr><td>Rechte Taste + Ziehen</td><td>Pan (Verschieben)</td></tr>
+        <tr><td>Mausrad</td><td>Vorwärts / Rückwärts (unbegrenzt)</td></tr>
+        <tr><td>Shift + Mausrad</td><td>3× schneller</td></tr>
+        <tr><td>Klick auf Unit</td><td>Unit auswählen + Abhängigkeiten hervorheben</td></tr>
+        <tr><td>Klick auf Hintergrund</td><td>Auswahl aufheben</td></tr>
+      </table>
+
+      <p class="help-hint"><kbd>?</kbd> — diesen Dialog öffnen / schließen</p>
     </div>
   </div>
 

@@ -10,6 +10,7 @@ const highlightNodeIds = new Set();
 const highlightLinkSet = new Set();
 
 let visFilter = { formsOnly: false, sameDir: false, usesFiltered: false };
+let _maxNodes = 20000;
 
 // ── Error / Loading helpers ──────────────────────────────
 
@@ -309,6 +310,31 @@ function initGraph() {
     };
     window.addEventListener('resize', resize);
     setTimeout(resize, 100);
+
+    // Disable OrbitControls dolly (has a hard stop at minDistance).
+    // Replace with FPS-style forward movement so the user can zoom through any point.
+    setTimeout(() => {
+      const ctrl = typeof Graph.controls === 'function' ? Graph.controls() : null;
+      if (ctrl) ctrl.enableZoom = false;
+    }, 200);
+
+    container.addEventListener('wheel', ev => {
+      if (!Graph) return;
+      ev.preventDefault();
+      const cam  = Graph.camera();
+      const ctrl = typeof Graph.controls === 'function' ? Graph.controls() : null;
+      const fwd  = _camFwd(cam);
+      const d    = -ev.deltaY * (ev.shiftKey ? 5 : 1.5);
+      cam.position.x += fwd.x * d;
+      cam.position.y += fwd.y * d;
+      cam.position.z += fwd.z * d;
+      if (ctrl?.target) {
+        ctrl.target.x += fwd.x * d;
+        ctrl.target.y += fwd.y * d;
+        ctrl.target.z += fwd.z * d;
+        ctrl.update();
+      }
+    }, { passive: false });
 
   } catch(e) {
     showError('initGraph Fehler: ' + e.message);
@@ -617,12 +643,50 @@ function obliqueCameraOnGraph(depthAxis) {
     Math.max(...ys) - Math.min(...ys),
     Math.max(...zs) - Math.min(...zs)) + 300;
 
-  const off = depthAxis === 'y'
-    ? { x: span * 0.85, y: span * 0.25, z: span * 0.95 }   // side view, slight elevation
-    : { x: span * 0.75, y: span * 0.55, z: span * 0.85 };  // above/front view
+  const off = { x: span * 0.75, y: span * 0.55, z: span * 0.85 };
   Graph.cameraPosition(
     { x: cx + off.x, y: cy + off.y, z: cz + off.z },
     { x: cx, y: cy, z: cz }, 0);
+}
+
+// Shared helper: camera above root level, slightly in front, looking onto the filled area.
+// rootAxis='y': tree mode (depth on Y, spread in XZ)
+// rootAxis='z': force/3D mode (depth on Z, spread in XY)
+function rootTopCamera(rootAxis) {
+  const gd = Graph.graphData();
+  if (!gd.nodes.length) return;
+  const xs = gd.nodes.map(n => n.x ?? 0);
+  const ys = gd.nodes.map(n => n.y ?? 0);
+  const zs = gd.nodes.map(n => n.z ?? 0);
+
+  if (rootAxis === 'y') {
+    const cx = (Math.min(...xs) + Math.max(...xs)) / 2;
+    const cz = (Math.min(...zs) + Math.max(...zs)) / 2;
+    const maxY = Math.max(...ys);
+    const spanY  = maxY - Math.min(...ys);
+    const spanXZ = Math.max(Math.max(...xs) - Math.min(...xs), Math.max(...zs) - Math.min(...zs)) + 1;
+    const dist   = Math.max(spanY, spanXZ);
+    Graph.cameraPosition(
+      { x: cx, y: maxY + dist * 0.25, z: cz + dist * 0.7 },
+      { x: cx, y: maxY - spanY * 0.2, z: cz }, 0);
+  } else {
+    // 3D/force mode: root at (0,0,0), depth on negative Z, rings in XY
+    const spanZ  = Math.max(...zs) - Math.min(...zs);
+    const spanXY = Math.max(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys)) + 1;
+    const dist   = Math.max(spanZ, spanXY);
+    const a      = 30 * Math.PI / 180;
+    const vd     = dist * 0.8;
+
+    // Set camera directly via THREE.js to avoid OrbitControls orientation glitches
+    const cam  = Graph.camera();
+    const ctrl = typeof Graph.controls === 'function' ? Graph.controls() : null;
+    cam.up.set(0, 1, 0);
+    cam.position.set(0, vd * Math.sin(a), vd * Math.cos(a));
+    if (ctrl) {
+      ctrl.target.set(0, 0, 0); // look at root
+      ctrl.update();
+    }
+  }
 }
 
 // 3D layered layout: each depth becomes a concentric ring, and depth is mapped
@@ -662,8 +726,13 @@ function seed3DPositions(nodes, links, rootId) {
 
 // Expand DAG → true tree: duplicate nodes that appear in multiple branches.
 // Cycle edges (back-edges within the current DFS path) are dropped.
+window.setMaxNodes = function(n) {
+  _maxNodes = Math.max(100, n);
+  if (layoutMode === 'tree' && currentData) applyLayout('tree');
+};
+
 function expandToTree(nodes, links, rootId) {
-  const MAX_NODES = 20000;
+  const MAX_NODES = _maxNodes;
   const origById = new Map(nodes.map(n => [n.id, n]));
 
   const fwd = new Map(nodes.map(n => [n.id, []]));
@@ -748,8 +817,8 @@ function applyLayout(mode, data) {
       let frames = 0;
       const tick = () => { syncMeshes(); if (++frames < 240) requestAnimationFrame(tick); };
       requestAnimationFrame(tick);
-      if (mode === 'tree')       obliqueCameraOnGraph('y');  // depth on Y → view from side
-      else if (mode === 'force') obliqueCameraOnGraph('z');  // depth on Z
+      if (mode === 'tree')       rootTopCamera('y');
+      else if (mode === 'force') rootTopCamera('z');
       else                       centerCameraOnGraph();
     } catch (e) {
       log(`Layout ${mode} ERROR: ${e.message}`);
@@ -826,6 +895,115 @@ function log(msg) {
   console.log(msg);
   postToHost({ type: 'log', msg: String(msg) });
 }
+
+// ── Keyboard navigation (WASD + QE + RF) ─────────────────
+//
+//  W/S  — forward / backward  (camera look direction)
+//  A/D  — strafe left / right
+//  Q/E  — roll CCW / CW       (rotate around look axis)
+//  R/F  — ascend / descend    (world Y axis)
+//  Shift — 3× speed boost
+
+const _navKeys = new Set(['w','s','a','d','q','e','r','f',
+                          'arrowleft','arrowright','arrowup','arrowdown']);
+const _keysDown = new Set();
+
+function toggleHelp() {
+  document.getElementById('help-modal').classList.toggle('visible');
+}
+window.showHelp = () => document.getElementById('help-modal').classList.add('visible');
+
+document.addEventListener('keydown', ev => {
+  if (ev.target.tagName === 'INPUT' || ev.target.tagName === 'TEXTAREA') return;
+  if (ev.key === '?' || ev.key === 'F1') { toggleHelp(); ev.preventDefault(); return; }
+  if (ev.key === 'Escape') { document.getElementById('help-modal').classList.remove('visible'); return; }
+  const k = ev.key.toLowerCase();
+  if (!_navKeys.has(k) && k !== 'shift') return;
+  _keysDown.add(k);
+  ev.preventDefault();
+});
+document.addEventListener('keyup', ev => _keysDown.delete(ev.key.toLowerCase()));
+
+// Read camera local axes from its world matrix (no THREE.Vector3 import needed)
+function _camFwd(cam) { const m = cam.matrixWorld.elements; return { x: -m[8], y: -m[9], z: -m[10] }; }
+function _camRgt(cam) { const m = cam.matrixWorld.elements; return { x:  m[0], y:  m[1], z:   m[2] }; }
+
+(function _navLoop() {
+  requestAnimationFrame(_navLoop);
+  if (!Graph || _keysDown.size === 0) return;
+
+  const cam  = Graph.camera();
+  const ctrl = typeof Graph.controls === 'function' ? Graph.controls() : null;
+  const fast = _keysDown.has('shift');
+  const spd  = fast ? 270 : 90;
+
+  const fwd = _camFwd(cam);
+  const rgt = _camRgt(cam);
+
+  let dx = 0, dy = 0, dz = 0;
+  if (_keysDown.has('w')) { dx += fwd.x*spd; dy += fwd.y*spd; dz += fwd.z*spd; }
+  if (_keysDown.has('s')) { dx -= fwd.x*spd; dy -= fwd.y*spd; dz -= fwd.z*spd; }
+  if (_keysDown.has('a')) { dx -= rgt.x*spd; dy -= rgt.y*spd; dz -= rgt.z*spd; }
+  if (_keysDown.has('d')) { dx += rgt.x*spd; dy += rgt.y*spd; dz += rgt.z*spd; }
+  // Ascend/descend along camera's local up axis (tracks roll)
+  const up = cam.up;
+  if (_keysDown.has('r')) { dx += up.x*spd; dy += up.y*spd; dz += up.z*spd; }
+  if (_keysDown.has('f')) { dx -= up.x*spd; dy -= up.y*spd; dz -= up.z*spd; }
+
+  cam.position.x += dx; cam.position.y += dy; cam.position.z += dz;
+  if (ctrl?.target) {
+    ctrl.target.x += dx; ctrl.target.y += dy; ctrl.target.z += dz;
+    ctrl.update();
+  }
+
+  // Roll: rotate camera.up around the forward axis (Rodrigues' formula)
+  const rollDelta = _keysDown.has('e') ? 0.015 : _keysDown.has('q') ? -0.015 : 0;
+  if (rollDelta !== 0) {
+    const f = _camFwd(cam);
+    const u = cam.up;
+    const c = Math.cos(rollDelta), s = Math.sin(rollDelta);
+    const dot = f.x*u.x + f.y*u.y + f.z*u.z;
+    cam.up.set(
+      c*u.x + s*(f.y*u.z - f.z*u.y) + (1-c)*dot*f.x,
+      c*u.y + s*(f.z*u.x - f.x*u.z) + (1-c)*dot*f.y,
+      c*u.z + s*(f.x*u.y - f.y*u.x) + (1-c)*dot*f.z
+    );
+    if (ctrl) ctrl.update();
+  }
+
+  // Arrow keys: FPS look — rotate the look direction, camera stays fixed
+  const TILT = 0.018;
+  const tiltH = _keysDown.has('arrowleft') ?  TILT : _keysDown.has('arrowright') ? -TILT : 0;
+  const tiltV = _keysDown.has('arrowup')   ?  TILT : _keysDown.has('arrowdown')  ? -TILT : 0;
+  if ((tiltH !== 0 || tiltV !== 0) && ctrl?.target) {
+    // Look vector: camera → target (FPS: we rotate this, camera stays fixed)
+    let ox = ctrl.target.x - cam.position.x;
+    let oy = ctrl.target.y - cam.position.y;
+    let oz = ctrl.target.z - cam.position.z;
+
+    const rotAround = (ox, oy, oz, ax, ay, az, a) => {
+      const c = Math.cos(a), s = Math.sin(a), d = ax*ox + ay*oy + az*oz;
+      return [
+        c*ox + s*(ay*oz - az*oy) + (1-c)*d*ax,
+        c*oy + s*(az*ox - ax*oz) + (1-c)*d*ay,
+        c*oz + s*(ax*oy - ay*ox) + (1-c)*d*az,
+      ];
+    };
+
+    if (tiltH !== 0) {                      // yaw: around camera up
+      const u = cam.up;
+      [ox, oy, oz] = rotAround(ox, oy, oz, u.x, u.y, u.z, tiltH);
+    }
+    if (tiltV !== 0) {                      // pitch: around camera right
+      const r = _camRgt(cam);
+      [ox, oy, oz] = rotAround(ox, oy, oz, r.x, r.y, r.z, tiltV);
+    }
+
+    // Move target, keep camera fixed
+    ctrl.target.set(cam.position.x + ox, cam.position.y + oy, cam.position.z + oz);
+    ctrl.update();
+  }
+})();
 
 // ── Bootstrap ────────────────────────────────────────────
 

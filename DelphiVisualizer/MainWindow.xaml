@@ -37,7 +37,13 @@
           <Button x:Name="BtnRadial" Content="Radial" Style="{StaticResource LayoutButton}"
                   Click="BtnRadial_Click" Margin="0,0,16,0" ToolTip="Radiales Layout"/>
           <Button Content="↺ Kamera" Style="{StaticResource LayoutButton}"
-                  Click="BtnResetCamera_Click" ToolTip="Kamera zurücksetzen"/>
+                  Click="BtnResetCamera_Click" ToolTip="Kamera zurücksetzen" Margin="0,0,8,0"/>
+          <Button Content="⚙ Optionen" Style="{StaticResource LayoutButton}"
+                  Click="BtnOptions_Click" ToolTip="Optionen"
+                  Margin="0,0,4,0"/>
+          <Button Content="?" Style="{StaticResource LayoutButton}"
+                  Click="BtnHelp_Click" ToolTip="Steuerung anzeigen"
+                  Width="26" FontWeight="Bold" Foreground="#64B5F6"/>
         </StackPanel>
 
         <!-- Center: project + unit selection -->

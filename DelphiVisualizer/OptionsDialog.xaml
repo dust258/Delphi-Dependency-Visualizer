@@ -1,0 +1,64 @@
+<Window x:Class="DelphiVisualizer.OptionsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Optionen — Delphi Visualizer"
+        Width="400" SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="#0A0E1A"
+        Foreground="#E0E6F0">
+  <Grid Margin="24,20,24,24">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="20"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+
+    <!-- Section header -->
+    <TextBlock Grid.Row="0"
+               Text="DARSTELLUNG"
+               Foreground="#607090" FontSize="9" FontWeight="SemiBold"
+               Margin="0,0,0,10"/>
+
+    <!-- Options card -->
+    <Border Grid.Row="1"
+            Background="#080C18"
+            BorderBrush="#1E2D50" BorderThickness="1"
+            CornerRadius="6" Padding="14,12">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="12"/>
+          <ColumnDefinition Width="100"/>
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+          <TextBlock Text="Max. Knoten" Foreground="#E0E6F0" FontSize="12"/>
+          <TextBlock Text="Maximale Knotenanzahl im Baum-Modus"
+                     Foreground="#607090" FontSize="10" Margin="0,3,0,0"
+                     TextWrapping="Wrap"/>
+        </StackPanel>
+
+        <TextBox x:Name="TbMaxNodes"
+                 Grid.Column="2"
+                 Style="{StaticResource SearchBox}"
+                 VerticalContentAlignment="Center"
+                 TextAlignment="Right"
+                 PreviewTextInput="TbMaxNodes_PreviewTextInput"
+                 PreviewKeyDown="TbMaxNodes_PreviewKeyDown"/>
+      </Grid>
+    </Border>
+
+    <!-- Buttons -->
+    <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
+      <Button Content="Abbrechen" Style="{StaticResource LayoutButton}"
+              Width="90" Height="30" Margin="0,0,8,0"
+              Click="BtnCancel_Click"/>
+      <Button Content="OK" Style="{StaticResource ToolbarButton}"
+              Width="80" Height="30"
+              Background="#1A3A5A" BorderBrush="#2A5A8A" Foreground="#64B5F6"
+              Click="BtnOk_Click" IsDefault="True"/>
+    </StackPanel>
+  </Grid>
+</Window>

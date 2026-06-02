@@ -230,6 +230,107 @@ html, body {
   inset: 0;
 }
 
+/* ── Help button ─────────────────────────────────────────── */
+#help-btn {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--bg-panel);
+  border: 1px solid var(--bg-panel-border);
+  color: var(--accent);
+  font-size: 16px; font-weight: 700;
+  cursor: pointer;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+#help-btn:hover { background: rgba(100,181,246,0.15); }
+
+/* ── Help modal ──────────────────────────────────────────── */
+#help-modal {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 400;
+  backdrop-filter: blur(4px);
+}
+#help-modal.visible { display: flex; }
+
+#help-content {
+  background: var(--bg-panel);
+  border: 1px solid var(--bg-panel-border);
+  border-radius: 12px;
+  padding: 24px 28px 20px;
+  width: 440px;
+  max-width: 95vw;
+  position: relative;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+}
+
+#help-content h2 {
+  font-size: 16px; font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+#help-content h3 {
+  font-size: 11px; font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin: 14px 0 6px;
+}
+
+.help-close {
+  position: absolute; top: 12px; right: 14px;
+  background: none; border: none;
+  color: var(--text-secondary); font-size: 16px;
+  cursor: pointer; line-height: 1;
+  padding: 4px 6px; border-radius: 4px;
+}
+.help-close:hover { color: var(--text-primary); background: rgba(255,255,255,0.07); }
+
+.help-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.help-table td {
+  padding: 4px 6px;
+  vertical-align: middle;
+  color: var(--text-secondary);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.help-table td:first-child {
+  width: 42%;
+  white-space: nowrap;
+}
+.help-table td:last-child { color: var(--text-primary); }
+
+kbd {
+  display: inline-block;
+  padding: 1px 5px;
+  background: rgba(100,181,246,0.12);
+  border: 1px solid rgba(100,181,246,0.25);
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 11px;
+  color: var(--accent);
+  margin: 0 1px;
+}
+
+.help-hint {
+  margin-top: 14px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
 #load-error {
   position: absolute;
   inset: 0;

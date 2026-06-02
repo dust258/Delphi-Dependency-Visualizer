@@ -27,6 +27,7 @@ public partial class MainWindow : Window
     // Persistence
     private string? _currentProjectPath;
     private bool _autoAnalyzeOnReady = false;
+    private int _maxNodes = 20000;
     private static readonly string SettingsPath = System.IO.Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
         "DelphiVisualizer", "settings.json");
@@ -44,7 +45,7 @@ public partial class MainWindow : Window
 
     // ── Settings persistence ─────────────────────────────────
 
-    private record AppSettings(string ProjectPath, string Unit, int Depth);
+    private record AppSettings(string ProjectPath, string Unit, int Depth, int MaxNodes = 20000);
 
     private void SaveSettings()
     {
@@ -54,7 +55,7 @@ public partial class MainWindow : Window
             var dir = System.IO.Path.GetDirectoryName(SettingsPath)!;
             System.IO.Directory.CreateDirectory(dir);
             var settings = new AppSettings(
-                _currentProjectPath, _selectedUnit, (int)SlDepth.Value);
+                _currentProjectPath, _selectedUnit, (int)SlDepth.Value, _maxNodes);
             System.IO.File.WriteAllText(SettingsPath,
                 JsonSerializer.Serialize(settings));
         }
@@ -72,6 +73,7 @@ public partial class MainWindow : Window
                 return;
 
             SlDepth.Value = settings.Depth > 0 ? settings.Depth : 3;
+            _maxNodes = settings.MaxNodes > 0 ? settings.MaxNodes : 20000;
             LoadProject(settings.ProjectPath, settings.Unit);
             // Auto-analyze once the WebView is ready
             _autoAnalyzeOnReady = !string.IsNullOrEmpty(settings.Unit);
@@ -442,6 +444,7 @@ public partial class MainWindow : Window
 
     private async void SendGraphToWebView(string json)
     {
+        await WebView.ExecuteScriptAsync($"setMaxNodes({_maxNodes})");
         await WebView.ExecuteScriptAsync($"loadGraph({json})");
     }
 
@@ -598,6 +601,18 @@ public partial class MainWindow : Window
 
     private void BtnResetCamera_Click(object sender, RoutedEventArgs e)
         => _ = WebView.ExecuteScriptAsync("resetCamera()");
+
+    private void BtnOptions_Click(object sender, RoutedEventArgs e)
+    {
+        var dlg = new OptionsDialog(_maxNodes) { Owner = this };
+        if (dlg.ShowDialog() != true) return;
+        _maxNodes = dlg.MaxNodes;
+        SaveSettings();
+        _ = WebView.ExecuteScriptAsync($"setMaxNodes({_maxNodes})");
+    }
+
+    private void BtnHelp_Click(object sender, RoutedEventArgs e)
+        => _ = WebView.ExecuteScriptAsync("showHelp()");
 
     private void SetStatus(string text) => TbStatus.Text = text;
 }

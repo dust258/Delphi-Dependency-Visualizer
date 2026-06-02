@@ -11,16 +11,37 @@ const highlightNodeIds = new Set();
 let visFilter = { formsOnly: false, sameDir: false, usesFiltered: false };
 let _maxNodes = 20000;
 
+// ── Internationalisierung ────────────────────────────────────
+let _t = {};
+
+window.setLanguage = function(lang, dict) {
+  _t = dict || {};
+  applyTranslations();
+};
+
+function t(key, ...args) {
+  let s = _t[key] ?? key;
+  args.forEach((a, i) => s = s.replace(`{${i}}`, String(a)));
+  return s;
+}
+
+function applyTranslations() {
+  document.querySelectorAll('[data-i18n]').forEach(el =>
+    el.textContent = t(el.dataset.i18n));
+  document.querySelectorAll('[data-i18n-title]').forEach(el =>
+    el.title = t(el.dataset.i18nTitle));
+}
+
 // ── Web Worker für Layout-Berechnung ────────────────────────
 const _layoutWorker = new Worker('layoutWorker.js');
 _layoutWorker.onerror = ev => {
-  log('Worker-Fehler: ' + ev.message);
-  showError('Layout-Worker konnte nicht geladen werden: ' + ev.message);
+  log('Worker error: ' + ev.message);
+  showError(t('error.workerLoad', ev.message));
 };
 _layoutWorker.onmessage = ev => {
   if (ev.data.error) {
-    log('Worker-Fehler: ' + ev.data.error);
-    showError('Layout-Fehler im Worker: ' + ev.data.error);
+    log('Worker error: ' + ev.data.error);
+    showError(t('error.workerFailed', ev.data.error));
     hideLoading();
     return;
   }
@@ -279,7 +300,7 @@ function seedRadialPositions(nodes, links, rootId) {
 
 function initGraph() {
   if (typeof ForceGraph3D === 'undefined') {
-    showError('ForceGraph3D nicht verfügbar — 3d-force-graph.min.js konnte nicht geladen werden.');
+    showError(t('error.libNotInit'));
     return;
   }
 
@@ -300,7 +321,7 @@ function initGraph() {
           pointer-events:none;
           white-space:nowrap;
         ">${node.name}<br>
-        <span style="font-size:10px;color:#8899BB">${node.unitType}${node.__depth !== undefined ? ' · Tiefe ' + node.__depth : ''}</span>
+        <span style="font-size:10px;color:#8899BB">${node.unitType}${node.__depth !== undefined ? ' · ' + t('tooltip.depth', node.__depth) : ''}</span>
         </div>`)
       .nodeColor(node => node.color)
       .nodeVal(node => node.isRoot ? 1000 : Math.min(node.val ?? 1, 6))
@@ -352,7 +373,7 @@ function initGraph() {
     }, { passive: false });
 
   } catch(e) {
-    showError('initGraph Fehler: ' + e.message);
+    showError(t('error.renderFailed', e.message));
     console.error(e);
   }
 }
@@ -589,7 +610,7 @@ window.loadGraph = function(data) {
   visFilter = { formsOnly: false, sameDir: false, usesFiltered: false };
 
   if (!Graph) {
-    showError('ForceGraph3D nicht initialisiert — drücke F12 für Details.');
+    showError(t('error.libNotInit'));
     return;
   }
 
@@ -605,7 +626,7 @@ window.loadGraph = function(data) {
       applyLayout(layoutMode, data);
 
     } catch(e) {
-      showError('Render-Fehler: ' + e.message);
+      showError(t('error.renderFailed', e.message));
       console.error(e);
     } finally {
       hideLoading();
@@ -885,7 +906,7 @@ function _applyLayoutResult(mode, nodes, links) {
 
   } catch(e) {
     log(`_applyLayoutResult ERROR: ${e.message}`);
-    showError('Layout-Fehler: ' + e.message);
+    showError(t('error.layoutFailed', e.message));
   }
 }
 

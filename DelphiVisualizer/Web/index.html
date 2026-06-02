@@ -17,23 +17,23 @@
   <div id="info-panel">
     <h3 id="ip-name"></h3>
     <div id="ip-badge" class="type-badge"></div>
-    <div class="info-row"><span>Interface-Uses</span><span id="ip-iface"></span></div>
-    <div class="info-row"><span>Impl.-Uses</span><span id="ip-impl"></span></div>
-    <div class="info-row"><span>Eingehende Deps</span><span id="ip-in"></span></div>
+    <div class="info-row"><span data-i18n="panel.ifaceUses">Interface-Uses</span><span id="ip-iface"></span></div>
+    <div class="info-row"><span data-i18n="panel.implUses">Impl.-Uses</span><span id="ip-impl"></span></div>
+    <div class="info-row"><span data-i18n="panel.incomingDeps">Eingehende Deps</span><span id="ip-in"></span></div>
     <p class="info-filepath" id="ip-path"></p>
-    <div id="ip-cycle" class="cycle-warning" style="display:none">⚠ Teil eines Zyklus</div>
+    <div id="ip-cycle" class="cycle-warning" style="display:none" data-i18n="panel.cycleWarning">⚠ Teil eines Zyklus</div>
   </div>
 
   <!-- Stats -->
   <div id="stats-overlay">
-    <b id="st-units">0</b> Units &nbsp;·&nbsp;
-    <b id="st-edges">0</b> Edges &nbsp;·&nbsp;
-    <b id="st-cycles">0</b> Zyklen
+    <b id="st-units">0</b> <span data-i18n="stats.units">Units</span> &nbsp;·&nbsp;
+    <b id="st-edges">0</b> <span data-i18n="stats.edges">Edges</span> &nbsp;·&nbsp;
+    <b id="st-cycles">0</b> <span data-i18n="stats.cycles">Zyklen</span>
   </div>
 
   <!-- Cycle list -->
   <div id="cycle-panel">
-    <h4>⚠ Zirkuläre Abhängigkeiten</h4>
+    <h4 data-i18n="cyclespanel.heading">⚠ Zirkuläre Abhängigkeiten</h4>
     <div id="cycle-list"></div>
   </div>
 
@@ -41,45 +41,42 @@
   <div id="legend">
     <div class="legend-item">
       <span class="legend-gradient"></span>
-      <span style="color:#607080">wenig Uses</span>
+      <span style="color:#607080" data-i18n="legend.fewUses">wenig Uses</span>
       <span style="margin:0 4px;color:#8899BB">→</span>
-      <span style="color:#FF2020">viele Uses</span>
+      <span style="color:#FF2020" data-i18n="legend.manyUses">viele Uses</span>
     </div>
   </div>
-
-  <!-- Help button -->
-  <button id="help-btn" onclick="toggleHelp()" title="Steuerung (?)">?</button>
 
   <!-- Help modal -->
   <div id="help-modal" onclick="if(event.target===this)toggleHelp()">
     <div id="help-content">
       <button class="help-close" onclick="toggleHelp()">✕</button>
-      <h2>Steuerung</h2>
+      <h2 data-i18n="help.title">Steuerung</h2>
 
-      <h3>Tastatur — Navigation</h3>
+      <h3 data-i18n="help.sectionKeyboardNav">Tastatur — Navigation</h3>
       <table class="help-table">
-        <tr><td><kbd>W</kbd> / <kbd>S</kbd></td><td>Vorwärts / Rückwärts</td></tr>
-        <tr><td><kbd>A</kbd> / <kbd>D</kbd></td><td>Links / Rechts (seitwärts)</td></tr>
-        <tr><td><kbd>Q</kbd> / <kbd>E</kbd></td><td>Rollen links / rechts</td></tr>
-        <tr><td><kbd>R</kbd> / <kbd>F</kbd></td><td>Aufsteigen / Absenken</td></tr>
-        <tr><td><kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd></td><td>Blickrichtung neigen / schwenken</td></tr>
-        <tr><td><kbd>Shift</kbd> + Taste</td><td>3× Geschwindigkeit</td></tr>
+        <tr><td><kbd>W</kbd> / <kbd>S</kbd></td><td data-i18n="help.keyForward">Vorwärts / Rückwärts</td></tr>
+        <tr><td><kbd>A</kbd> / <kbd>D</kbd></td><td data-i18n="help.keyStrafeLeftRight">Links / Rechts (seitwärts)</td></tr>
+        <tr><td><kbd>Q</kbd> / <kbd>E</kbd></td><td data-i18n="help.keyRoll">Rollen links / rechts</td></tr>
+        <tr><td><kbd>R</kbd> / <kbd>F</kbd></td><td data-i18n="help.keyUpDown">Aufsteigen / Absenken</td></tr>
+        <tr><td><kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd></td><td data-i18n="help.keyArrows">Blickrichtung neigen / schwenken</td></tr>
+        <tr><td><kbd>Shift</kbd> + Taste</td><td data-i18n="help.keyShift">3× Geschwindigkeit</td></tr>
       </table>
 
-      <h3>Maus</h3>
+      <h3 data-i18n="help.sectionMouse">Maus</h3>
       <table class="help-table">
-        <tr><td>Linke Taste + Ziehen</td><td>Orbit (Kamera drehen)</td></tr>
-        <tr><td>Rechte Taste + Ziehen</td><td>Pan (Verschieben)</td></tr>
-        <tr><td>Mausrad</td><td>Vorwärts / Rückwärts (unbegrenzt)</td></tr>
-        <tr><td>Shift + Mausrad</td><td>3× schneller</td></tr>
-        <tr><td>Klick auf Unit</td><td>Unit auswählen + Abhängigkeiten hervorheben</td></tr>
-        <tr><td>Klick auf Hintergrund</td><td>Auswahl aufheben</td></tr>
+        <tr><td>Linke Taste + Ziehen</td><td data-i18n="help.mouseLDrag">Orbit (Kamera drehen)</td></tr>
+        <tr><td>Rechte Taste + Ziehen</td><td data-i18n="help.mouseRDrag">Pan (Verschieben)</td></tr>
+        <tr><td>Mausrad</td><td data-i18n="help.mouseWheel">Vorwärts / Rückwärts (unbegrenzt)</td></tr>
+        <tr><td>Shift + Mausrad</td><td data-i18n="help.mouseShiftWheel">3× schneller</td></tr>
+        <tr><td>Klick auf Unit</td><td data-i18n="help.mouseClickNode">Unit auswählen + Abhängigkeiten hervorheben</td></tr>
+        <tr><td>Klick auf Hintergrund</td><td data-i18n="help.mouseClickBg">Auswahl aufheben</td></tr>
       </table>
 
-      <p class="help-hint"><kbd>?</kbd> — diesen Dialog öffnen / schließen</p>
+      <p class="help-hint"><kbd>?</kbd> — <span data-i18n="help.keyHint">diesen Dialog öffnen / schließen</span></p>
 
       <div class="help-about">
-        <span>Delphi Dependency Visualizer v1.0</span>
+        <span data-i18n="help.aboutVersion">Delphi Dependency Visualizer v1.0</span>
         <span>Michael Bröker &nbsp;·&nbsp; <a href="mailto:dust258@gmail.com">dust258@gmail.com</a></span>
       </div>
     </div>
@@ -93,9 +90,9 @@
 
   <!-- Error display -->
   <div id="load-error">
-    <div>⚠ Fehler beim Laden der 3D-Bibliothek</div>
+    <div data-i18n="error.libraryLoad">⚠ Fehler beim Laden der 3D-Bibliothek</div>
     <code id="load-error-msg"></code>
-    <div style="color:#8899BB;font-size:12px">Drücke F12 für Details in den DevTools</div>
+    <div style="color:#8899BB;font-size:12px" data-i18n="error.devtools">Drücke F12 für Details in den DevTools</div>
   </div>
 
 <script src="app.js"></script>

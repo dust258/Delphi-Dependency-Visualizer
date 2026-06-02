@@ -1,6 +1,7 @@
 using DelphiVisualizer.Graph;
 using DelphiVisualizer.Models;
 using DelphiVisualizer.Parser;
+using DelphiVisualizer.Services;
 using Microsoft.Web.WebView2.Core;
 using System.Collections.ObjectModel;
 using System.Text.Json;
@@ -8,6 +9,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using static DelphiVisualizer.Services.L;
 
 namespace DelphiVisualizer;
 
@@ -42,13 +44,19 @@ public partial class MainWindow : Window
         SetActiveLayoutButton(BtnForce);
         NativeMethods.EnableDarkTitleBar(this);
         Icon = AppIconHelper.Get();
+
+        LocalizationManager.LanguageChanged += OnLanguageChanged;
+
         _ = InitWebViewAsync();
         TryRestoreLastSession();
     }
 
     // ── Settings persistence ─────────────────────────────────
 
-    private record AppSettings(string ProjectPath, string Unit, int Depth, int MaxNodes = 20000);
+    private record AppSettings(string ProjectPath, string Unit, int Depth, int MaxNodes = 20000, string Language = "de");
+
+    // Für LocalizationManager.NotifyWebViewAsync
+    public bool IsWebViewReady => _webViewReady;
 
     private void SaveSettings()
     {
@@ -58,7 +66,8 @@ public partial class MainWindow : Window
             var dir = System.IO.Path.GetDirectoryName(SettingsPath)!;
             System.IO.Directory.CreateDirectory(dir);
             var settings = new AppSettings(
-                _currentProjectPath, _selectedUnit, (int)SlDepth.Value, _maxNodes);
+                _currentProjectPath, _selectedUnit, (int)SlDepth.Value, _maxNodes,
+                LocalizationManager.CurrentLanguage);
             System.IO.File.WriteAllText(SettingsPath,
                 JsonSerializer.Serialize(settings));
         }
@@ -77,6 +86,7 @@ public partial class MainWindow : Window
 
             SlDepth.Value = settings.Depth > 0 ? settings.Depth : 3;
             _maxNodes = settings.MaxNodes > 0 ? settings.MaxNodes : 20000;
+            LocalizationManager.Boot(settings.Language);
             LoadProject(settings.ProjectPath, settings.Unit);
             // Auto-analyze once the WebView is ready
             _autoAnalyzeOnReady = !string.IsNullOrEmpty(settings.Unit);
@@ -112,6 +122,10 @@ public partial class MainWindow : Window
         {
             await Task.Delay(300);
             _webViewReady = true;
+
+            // Sprache ins WebView propagieren
+            await LocalizationManager.SendToWebViewAsync(WebView);
+
             if (_pendingGraphJson != null)
             {
                 var json = _pendingGraphJson;
@@ -188,8 +202,8 @@ public partial class MainWindow : Window
     {
         var dlg = new Microsoft.Win32.OpenFileDialog
         {
-            Title = "Delphi-Projekt öffnen",
-            Filter = "Delphi-Projekt (*.dpr)|*.dpr",
+            Title  = T("filedialog.openTitle"),
+            Filter = T("filedialog.openFilter"),
             DefaultExt = ".dpr"
         };
         if (dlg.ShowDialog() != true) return;
@@ -200,7 +214,7 @@ public partial class MainWindow : Window
     {
         try
         {
-            SetStatus("Lade Projekt…");
+            SetStatus(T("status.loading"));
             _currentProjectPath = dprPath;
             _projectUnits = DprParser.Parse(dprPath);
             NodeClassifier.ClassifyAll(_projectUnits);
@@ -220,13 +234,13 @@ public partial class MainWindow : Window
             TbUnitSearch.IsEnabled = true;
             SlDepth.IsEnabled = true;
             BtnAnalyze.IsEnabled = _allUnitNames.Count > 0;
-            SetStatus($"{_projectUnits.Count} Units — {System.IO.Path.GetFileName(dprPath)}");
+            SetStatus(T("status.projectLoaded", _projectUnits.Count, System.IO.Path.GetFileName(dprPath)));
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Fehler beim Laden:\n{ex.Message}",
-                "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
-            SetStatus("Fehler beim Laden");
+            MessageBox.Show(T("errors.loadFailed", ex.Message),
+                T("errors.title"), MessageBoxButton.OK, MessageBoxImage.Error);
+            SetStatus(T("status.loadError"));
         }
     }
 
@@ -415,10 +429,11 @@ public partial class MainWindow : Window
 
     private void AnalyzeDependencies(string rootUnit)
     {
-        SetStatus("Analysiere…");
+        SetStatus(T("status.analyzing"));
         _selectedUnit = rootUnit;
-        SaveSettings();  // remember project + unit + depth for next launch
-        _ = WebView.ExecuteScriptAsync("showLoading('Analysiere Abhängigkeiten…')");
+        SaveSettings();
+        _ = WebView.ExecuteScriptAsync($"showLoading('{EscapeJson(T("loading.analyzing"))}')");
+
 
         var maxDepth = (int)SlDepth.Value >= 10 ? int.MaxValue : (int)SlDepth.Value;
 
@@ -438,9 +453,8 @@ public partial class MainWindow : Window
                     _pendingGraphJson = json;
 
                 var cycleText = graph.Cycles.Count > 0
-                    ? $" | ⚠ {graph.Cycles.Count} Zyklus/Zyklen" : "";
-                SetStatus(
-                    $"{graph.Units.Count} Units · {graph.Edges.Count} Kanten{cycleText}");
+                    ? T("status.cycles", graph.Cycles.Count) : "";
+                SetStatus(T("status.graphLoaded", graph.Units.Count, graph.Edges.Count) + cycleText);
             });
         });
     }
@@ -523,7 +537,7 @@ public partial class MainWindow : Window
         foreach (var item in items.OrderBy(i => i.Name))
             _filteredItems.Add(item);
 
-        TbUnitCount.Text = $"{_filteredItems.Count} / {_allUnitItems.Count} Units";
+        TbUnitCount.Text = T("sidebar.unitCount", _filteredItems.Count, _allUnitItems.Count);
     }
 
     private void SelectUnitInSidebar(string nodeId)
@@ -625,11 +639,24 @@ public partial class MainWindow : Window
     private void BtnResetCamera_Click(object sender, RoutedEventArgs e)
         => _ = WebView.ExecuteScriptAsync("resetCamera()");
 
+    // ── Sprache ──────────────────────────────────────────────
+
+    private void OnLanguageChanged()
+    {
+        // WPF-Properties die nicht per {s:L} gebunden sind hier manuell aktualisieren
+        TbStatus.Text = T("status.noProjectLoaded");
+        Title = T("app.title");
+    }
+
+    // ── Optionen ─────────────────────────────────────────────
+
     private void BtnOptions_Click(object sender, RoutedEventArgs e)
     {
         var dlg = new OptionsDialog(_maxNodes) { Owner = this };
         if (dlg.ShowDialog() != true) return;
         _maxNodes = dlg.MaxNodes;
+        if (dlg.Language != LocalizationManager.CurrentLanguage)
+            LocalizationManager.SetLanguage(dlg.Language);
         SaveSettings();
         _ = WebView.ExecuteScriptAsync($"setMaxNodes({_maxNodes})");
     }

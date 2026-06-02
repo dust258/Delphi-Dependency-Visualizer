@@ -13,7 +13,8 @@
   <DockPanel>
 
     <!-- ── Toolbar ─────────────────────────────────────────── -->
-    <Border DockPanel.Dock="Top"
+    <Border x:Name="ToolbarBorder"
+            DockPanel.Dock="Top"
             Background="#080C18"
             BorderBrush="#1E2D50"
             BorderThickness="0,0,0,1"
@@ -42,6 +43,9 @@
                   Click="BtnResetCamera_Click" ToolTip="{s:L toolbar.tooltipResetCamera}" Margin="0,0,8,0"/>
           <Button Content="{s:L toolbar.btnOptions}" Style="{StaticResource LayoutButton}"
                   Click="BtnOptions_Click" ToolTip="{s:L toolbar.tooltipOptions}"
+                  FontSize="14" Margin="0,0,4,0"/>
+          <Button Content="⛶" Style="{StaticResource LayoutButton}"
+                  Click="BtnFullscreen_Click" ToolTip="{s:L toolbar.tooltipFullscreen}"
                   FontSize="14" Margin="0,0,4,0"/>
           <Button Content="{s:L toolbar.btnHelp}" Style="{StaticResource LayoutButton}"
                   Click="BtnHelp_Click" ToolTip="{s:L toolbar.tooltipHelp}"
@@ -155,13 +159,14 @@
     <!-- ── Main Area ──────────────────────────────────────── -->
     <Grid>
       <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="220" MinWidth="160" MaxWidth="340"/>
-        <ColumnDefinition Width="4"/>
+        <ColumnDefinition x:Name="SidebarColumn" Width="220" MinWidth="160" MaxWidth="340"/>
+        <ColumnDefinition x:Name="SplitterColumn" Width="4"/>
         <ColumnDefinition Width="*"/>
       </Grid.ColumnDefinitions>
 
       <!-- ── Sidebar ──────────────────────────────────────── -->
-      <Border Grid.Column="0"
+      <Border x:Name="SidebarBorder"
+              Grid.Column="0"
               Background="#080C18"
               BorderBrush="#1E2D50"
               BorderThickness="0,0,1,0">
@@ -238,7 +243,8 @@
       </Border>
 
       <!-- ── Splitter ─────────────────────────────────────── -->
-      <GridSplitter Grid.Column="1"
+      <GridSplitter x:Name="MainSplitter"
+                    Grid.Column="1"
                     Width="4"
                     HorizontalAlignment="Stretch"
                     Background="#1E2D50"

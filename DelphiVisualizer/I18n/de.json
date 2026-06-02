@@ -20,6 +20,7 @@
   "toolbar.tooltipResetCamera": "Kamera zurücksetzen",
   "toolbar.tooltipOptions": "Optionen",
   "toolbar.tooltipHelp": "Steuerung anzeigen",
+  "toolbar.tooltipFullscreen": "Vollbild (nur Visualisierung) — F11, Esc zum Beenden",
 
   "status.noProjectLoaded": "Kein Projekt geladen",
   "status.loading": "Lade Projekt…",
@@ -100,5 +101,21 @@
   "error.layoutFailed": "Layout-Fehler: {0}",
   "error.devtools": "Drücke F12 für Details in den DevTools",
 
-  "tooltip.depth": "Tiefe {0}"
+  "tooltip.depth": "Tiefe {0}",
+
+  "nav.forward": "Vorwärts (W)",
+  "nav.backward": "Rückwärts (S)",
+  "nav.strafeLeft": "Links (A)",
+  "nav.strafeRight": "Rechts (D)",
+  "nav.rollLeft": "Rollen links (Q)",
+  "nav.rollRight": "Rollen rechts (E)",
+  "nav.ascend": "Aufsteigen (R)",
+  "nav.descend": "Absenken (F)",
+  "nav.lookUp": "Blick hoch (↑)",
+  "nav.lookDown": "Blick runter (↓)",
+  "nav.lookLeft": "Blick links (←)",
+  "nav.lookRight": "Blick rechts (→)",
+
+  "rotate.title": "Drehen",
+  "rotate.auto": "Automatisch drehen"
 }

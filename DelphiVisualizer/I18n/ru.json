@@ -20,6 +20,7 @@
   "toolbar.tooltipResetCamera": "Сбросить камеру",
   "toolbar.tooltipOptions": "Настройки",
   "toolbar.tooltipHelp": "Показать управление",
+  "toolbar.tooltipFullscreen": "Полный экран (только визуализация) — F11, Esc для выхода",
 
   "status.noProjectLoaded": "Проект не загружен",
   "status.loading": "Загрузка проекта…",
@@ -100,5 +101,21 @@
   "error.layoutFailed": "Ошибка макета: {0}",
   "error.devtools": "Нажмите F12 для деталей в DevTools",
 
-  "tooltip.depth": "Глубина {0}"
+  "tooltip.depth": "Глубина {0}",
+
+  "nav.forward": "Вперёд (W)",
+  "nav.backward": "Назад (S)",
+  "nav.strafeLeft": "Влево (A)",
+  "nav.strafeRight": "Вправо (D)",
+  "nav.rollLeft": "Крен влево (Q)",
+  "nav.rollRight": "Крен вправо (E)",
+  "nav.ascend": "Подъём (R)",
+  "nav.descend": "Спуск (F)",
+  "nav.lookUp": "Взгляд вверх (↑)",
+  "nav.lookDown": "Взгляд вниз (↓)",
+  "nav.lookLeft": "Взгляд влево (←)",
+  "nav.lookRight": "Взгляд вправо (→)",
+
+  "rotate.title": "Вращение",
+  "rotate.auto": "Автоповорот"
 }

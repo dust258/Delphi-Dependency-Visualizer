@@ -31,6 +31,61 @@
     <b id="st-cycles">0</b> <span data-i18n="stats.cycles">Zyklen</span>
   </div>
 
+  <!-- Rotate panel -->
+  <div id="rotate-panel">
+    <div class="nav-title" data-i18n="rotate.title">Drehen</div>
+    <label class="rotate-opt">
+      <input type="checkbox" id="cb-rot">
+      <span data-i18n="rotate.auto">Automatisch drehen</span>
+    </label>
+  </div>
+
+  <!-- Navigation panel -->
+  <div id="nav-panel">
+    <div class="nav-title">Navigation</div>
+    <div class="nav-body">
+
+      <!-- Bewegung (QE + RF + AD) -->
+      <div class="nav-group">
+        <div class="nav-row">
+          <button class="nav-btn" data-key="q" data-i18n-title="nav.rollLeft">↺</button>
+          <button class="nav-btn" data-key="r" data-i18n-title="nav.ascend">⬆</button>
+          <button class="nav-btn" data-key="e" data-i18n-title="nav.rollRight">↻</button>
+        </div>
+        <div class="nav-row">
+          <button class="nav-btn" data-key="a" data-i18n-title="nav.strafeLeft">◀</button>
+          <button class="nav-btn" data-key="f" data-i18n-title="nav.descend">⬇</button>
+          <button class="nav-btn" data-key="d" data-i18n-title="nav.strafeRight">▶</button>
+        </div>
+      </div>
+
+      <div class="nav-divider"></div>
+
+      <!-- Vorwärts / Rückwärts (WS) — eigene Mittelspalte -->
+      <div class="nav-group nav-group-vert">
+        <button class="nav-btn" data-key="w" data-i18n-title="nav.forward">＋</button>
+        <button class="nav-btn" data-key="s" data-i18n-title="nav.backward">－</button>
+      </div>
+
+      <div class="nav-divider"></div>
+
+      <!-- Blickrichtung (Pfeiltasten) -->
+      <div class="nav-group">
+        <div class="nav-row">
+          <span   class="nav-gap"></span>
+          <button class="nav-btn nav-look" data-key="arrowup"    data-i18n-title="nav.lookUp">↑</button>
+          <span   class="nav-gap"></span>
+        </div>
+        <div class="nav-row">
+          <button class="nav-btn nav-look" data-key="arrowleft"  data-i18n-title="nav.lookLeft">←</button>
+          <button class="nav-btn nav-look" data-key="arrowdown"  data-i18n-title="nav.lookDown">↓</button>
+          <button class="nav-btn nav-look" data-key="arrowright" data-i18n-title="nav.lookRight">→</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- Cycle list -->
   <div id="cycle-panel">
     <h4 data-i18n="cyclespanel.heading">⚠ Zirkuläre Abhängigkeiten</h4>

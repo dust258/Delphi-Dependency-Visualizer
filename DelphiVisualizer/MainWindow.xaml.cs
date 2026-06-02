@@ -191,6 +191,14 @@ public partial class MainWindow : Window
                     if (!string.IsNullOrEmpty(nodeId))
                         SelectUnitInSidebar(nodeId);
                 }
+                else if (type == "toggleFullscreen")
+                {
+                    ToggleFullscreen();
+                }
+                else if (type == "exitFullscreen")
+                {
+                    if (_isFullscreen) ToggleFullscreen();
+                }
             });
         }
         catch { }
@@ -663,6 +671,46 @@ public partial class MainWindow : Window
 
     private void BtnHelp_Click(object sender, RoutedEventArgs e)
         => _ = WebView.ExecuteScriptAsync("showHelp()");
+
+    // ── Vollbild (nur Visualisierung) ────────────────────────
+
+    private bool _isFullscreen = false;
+    private WindowState _prevWindowState = WindowState.Maximized;
+
+    private void BtnFullscreen_Click(object sender, RoutedEventArgs e) => ToggleFullscreen();
+
+    public void ToggleFullscreen()
+    {
+        _isFullscreen = !_isFullscreen;
+        if (_isFullscreen)
+        {
+            ToolbarBorder.Visibility = Visibility.Collapsed;
+            SidebarBorder.Visibility = Visibility.Collapsed;
+            MainSplitter.Visibility  = Visibility.Collapsed;
+            SidebarColumn.MinWidth = 0; // sonst klemmt Width=0 auf MinWidth (schwarzer Balken)
+            SidebarColumn.Width  = new GridLength(0);
+            SplitterColumn.Width = new GridLength(0);
+
+            _prevWindowState = WindowState == WindowState.Minimized ? WindowState.Maximized : WindowState;
+            WindowState = WindowState.Normal;
+            WindowStyle = WindowStyle.None;
+            ResizeMode  = ResizeMode.NoResize;
+            WindowState = WindowState.Maximized;
+        }
+        else
+        {
+            ToolbarBorder.Visibility = Visibility.Visible;
+            SidebarBorder.Visibility = Visibility.Visible;
+            MainSplitter.Visibility  = Visibility.Visible;
+            SidebarColumn.MinWidth = 160;
+            SidebarColumn.Width  = new GridLength(220);
+            SplitterColumn.Width = new GridLength(4);
+
+            WindowStyle = WindowStyle.SingleBorderWindow;
+            ResizeMode  = ResizeMode.CanResize;
+            WindowState = _prevWindowState;
+        }
+    }
 
     private void SetStatus(string text) => TbStatus.Text = text;
 }

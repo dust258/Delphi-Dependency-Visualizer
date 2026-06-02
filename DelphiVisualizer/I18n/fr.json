@@ -20,6 +20,7 @@
   "toolbar.tooltipResetCamera": "Réinitialiser la caméra",
   "toolbar.tooltipOptions": "Options",
   "toolbar.tooltipHelp": "Afficher les commandes",
+  "toolbar.tooltipFullscreen": "Plein écran (visualisation seule) — F11, Échap pour quitter",
 
   "status.noProjectLoaded": "Aucun projet chargé",
   "status.loading": "Chargement du projet…",
@@ -100,5 +101,21 @@
   "error.layoutFailed": "Erreur de disposition : {0}",
   "error.devtools": "Appuyez sur F12 pour les détails dans DevTools",
 
-  "tooltip.depth": "Profondeur {0}"
+  "tooltip.depth": "Profondeur {0}",
+
+  "nav.forward": "Avancer (W)",
+  "nav.backward": "Reculer (S)",
+  "nav.strafeLeft": "Déplacement gauche (A)",
+  "nav.strafeRight": "Déplacement droit (D)",
+  "nav.rollLeft": "Roulis gauche (Q)",
+  "nav.rollRight": "Roulis droit (E)",
+  "nav.ascend": "Monter (R)",
+  "nav.descend": "Descendre (F)",
+  "nav.lookUp": "Regarder en haut (↑)",
+  "nav.lookDown": "Regarder en bas (↓)",
+  "nav.lookLeft": "Regarder à gauche (←)",
+  "nav.lookRight": "Regarder à droite (→)",
+
+  "rotate.title": "Rotation",
+  "rotate.auto": "Rotation automatique"
 }

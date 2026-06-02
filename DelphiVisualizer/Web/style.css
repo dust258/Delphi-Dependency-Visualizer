@@ -125,6 +125,165 @@ html, body {
 #stats-overlay.visible { display: block; }
 #stats-overlay b { color: var(--accent); }
 
+/* ── Navigation Panel ───────────────────────────────────── */
+#nav-panel {
+  position: absolute;
+  bottom: 308px;
+  right: 16px;
+  width: 280px;
+  background: var(--bg-panel);
+  border: 1px solid var(--bg-panel-border);
+  border-radius: var(--panel-radius);
+  padding: 10px;
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+}
+#nav-panel.visible { display: flex; }
+
+.nav-title {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 1px;
+}
+
+.nav-body {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.nav-row {
+  display: flex;
+  gap: 3px;
+}
+
+.nav-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 5px;
+  background: rgba(100,181,246,0.07);
+  border: 1px solid rgba(100,181,246,0.18);
+  color: var(--accent);
+  font-size: 11px;
+  font-family: 'Segoe UI', monospace;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.1s, border-color 0.1s;
+  user-select: none;
+  -webkit-user-select: none;
+  line-height: 1;
+}
+.nav-btn:hover  { background: rgba(100,181,246,0.16); border-color: rgba(100,181,246,0.35); }
+.nav-btn.pressed { background: rgba(100,181,246,0.35); border-color: var(--accent); }
+
+.nav-gap { width: 30px; height: 30px; display: inline-block; }
+
+.nav-divider {
+  width: 1px;
+  background: rgba(100,181,246,0.12);
+  align-self: stretch;
+  margin: 0 2px;
+}
+
+.nav-group-vert {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+}
+
+/* ── Rotate Panel ────────────────────────────────────────── */
+#rotate-panel {
+  position: absolute;
+  bottom: 232px;
+  right: 16px;
+  width: 280px;
+  background: var(--bg-panel);
+  border: 1px solid var(--bg-panel-border);
+  border-radius: var(--panel-radius);
+  padding: 10px 14px 12px;
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  display: none;
+  flex-direction: column;
+  gap: 7px;
+}
+#rotate-panel.visible { display: flex; }
+
+#rotate-panel .nav-title { margin-bottom: 3px; }
+
+.rotate-opt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-primary);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.rotate-opt input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px; height: 16px;
+  border-radius: 4px;
+  border: 1px solid rgba(100,181,246,0.35);
+  background: rgba(100,181,246,0.07);
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.1s, border-color 0.1s;
+}
+.rotate-opt input[type="checkbox"]:hover { border-color: var(--accent); }
+.rotate-opt input[type="checkbox"]:checked {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.rotate-opt input[type="checkbox"]:checked::after {
+  content: "✓";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #0A0E1A;
+}
+
+.nav-shift {
+  width: 100%;
+  height: 26px;
+  font-size: 10px;
+  border-radius: 5px;
+}
+
+/* Blickrichtungs-Buttons leicht abgesetzt */
+.nav-btn.nav-look {
+  background: rgba(100,181,246,0.03);
+  border-style: dashed;
+  color: #7AAFD4;
+}
+.nav-btn.nav-look:hover  { background: rgba(100,181,246,0.13); border-style: solid; }
+.nav-btn.nav-look.pressed { background: rgba(100,181,246,0.30); border-style: solid; color: var(--accent); }
+
 /* ── Cycle Panel ─────────────────────────────────────────── */
 #cycle-panel {
   position: absolute;

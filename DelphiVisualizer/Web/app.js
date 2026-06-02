@@ -866,6 +866,9 @@ function _applyLayoutResult(mode, nodes, links) {
   hideLoading();
   log(`_applyLayoutResult mode=${mode} nodes=${nodes.length} links=${links.length}`);
   try {
+    // Auto-Rotation zurücksetzen — Hauptachsen für neues Layout neu bestimmen
+    _rotData = null;
+
     _nodeById = new Map(nodes.map(n => [n.id, n]));
 
     Graph.dagMode(null);
@@ -884,6 +887,8 @@ function _applyLayoutResult(mode, nodes, links) {
     document.getElementById('st-cycles').textContent = stats.cycleCount ?? currentData?.cycles?.length ?? 0;
     document.getElementById('stats-overlay').classList.add('visible');
     document.getElementById('legend').classList.add('visible');
+    document.getElementById('nav-panel').classList.add('visible');
+    document.getElementById('rotate-panel').classList.add('visible');
     buildCyclePanel(currentData?.cycles || []);
 
     // Anzahl der Sync-Frames skaliert mit Knotenanzahl
@@ -1023,7 +1028,13 @@ window.showHelp = () => document.getElementById('help-modal').classList.add('vis
 document.addEventListener('keydown', ev => {
   if (ev.target.tagName === 'INPUT' || ev.target.tagName === 'TEXTAREA') return;
   if (ev.key === '?' || ev.key === 'F1') { toggleHelp(); ev.preventDefault(); return; }
-  if (ev.key === 'Escape') { document.getElementById('help-modal').classList.remove('visible'); return; }
+  if (ev.key === 'F11') { postToHost({ type: 'toggleFullscreen' }); ev.preventDefault(); return; }
+  if (ev.key === 'Escape') {
+    const modal = document.getElementById('help-modal');
+    if (modal.classList.contains('visible')) { modal.classList.remove('visible'); return; }
+    postToHost({ type: 'exitFullscreen' }); // verlässt Vollbild (C# ignoriert, falls inaktiv)
+    return;
+  }
   const k = ev.key.toLowerCase();
   if (!_navKeys.has(k) && k !== 'shift') return;
   _keysDown.add(k);
@@ -1079,7 +1090,7 @@ function _camRgt(cam) { const m = cam.matrixWorld.elements; return { x:  m[0], y
   }
 
   // Arrow keys: FPS look — rotate the look direction, camera stays fixed
-  const TILT = 0.018;
+  const TILT = 0.0054; // 30 % des ursprünglichen Tempos
   const tiltH = _keysDown.has('arrowleft') ?  TILT : _keysDown.has('arrowright') ? -TILT : 0;
   const tiltV = _keysDown.has('arrowup')   ?  TILT : _keysDown.has('arrowdown')  ? -TILT : 0;
   if ((tiltH !== 0 || tiltV !== 0) && ctrl?.target) {
@@ -1110,6 +1121,77 @@ function _camRgt(cam) { const m = cam.matrixWorld.elements; return { x:  m[0], y
     ctrl.target.set(cam.position.x + ox, cam.position.y + oy, cam.position.z + oz);
     ctrl.update();
   }
+})();
+
+// ── Navigation Panel ─────────────────────────────────────
+
+(function _initNavPanel() {
+  document.querySelectorAll('#nav-panel [data-key]').forEach(btn => {
+    const key = btn.dataset.key;
+    const press   = () => { _keysDown.add(key);    btn.classList.add('pressed'); };
+    const release = () => { _keysDown.delete(key); btn.classList.remove('pressed'); };
+    btn.addEventListener('mousedown',  press);
+    btn.addEventListener('mouseup',    release);
+    btn.addEventListener('mouseleave', release);
+    btn.addEventListener('touchstart', e => { e.preventDefault(); press(); },   { passive: false });
+    btn.addEventListener('touchend',   e => { e.preventDefault(); release(); }, { passive: false });
+  });
+})();
+
+// ── Auto-Rotation (Drehen-Panel) ─────────────────────────
+// Kamerabasiert: das Objekt dreht sich um die X- und Z-Achse der Kamera.
+// Die Kamera bleibt fix; wir rotieren die gemeinsame THREE.Group der Knoten
+// um deren Schwerpunkt.
+let _autoRotate = false;
+let _rotData = null;  // { center, basePos }
+
+function _graphGroup() {
+  const n0 = Graph?.graphData()?.nodes?.[0]?.__threeObj;
+  return n0?.parent || null;
+}
+
+function _computeRotData(group) {
+  const nodes = Graph.graphData().nodes;
+  const n = nodes.length || 1;
+  let mx = 0, my = 0, mz = 0;
+  nodes.forEach(p => { mx += p.x || 0; my += p.y || 0; mz += p.z || 0; });
+  return {
+    center:  { x: mx / n, y: my / n, z: mz / n },
+    basePos: group.position.clone(),
+  };
+}
+
+(function _autoRotateLoop() {
+  requestAnimationFrame(_autoRotateLoop);
+  if (!Graph || !_autoRotate) return;
+  const group = _graphGroup();
+  if (!group) return;
+  if (!_rotData) _rotData = _computeRotData(group);
+
+  const SPEED = 0.0006; // 10 % des ursprünglichen Tempos
+  const cam = Graph.camera();
+
+  // Turntable: Drehung um die vertikale Kamera-Achse (cam.up), damit das
+  // Objekt seine Seiten zeigt — nicht um die Blickachse (Uhr) und nicht
+  // um die Querachse (Kippen).
+  const up = cam.up;
+  const q  = group.quaternion.clone();
+  const ax = cam.position.clone(); ax.set(up.x, up.y, up.z);
+  q.setFromAxisAngle(ax, SPEED);
+  group.quaternion.premultiply(q);
+
+  // Position so setzen, dass das Zentrum (Schwerpunkt) fix bleibt:
+  //   groupPos = O + C − R·C
+  const C = _rotData.center, O = _rotData.basePos;
+  const rc = cam.position.clone();
+  rc.set(C.x, C.y, C.z);
+  rc.applyQuaternion(group.quaternion);
+  group.position.set(O.x + C.x - rc.x, O.y + C.y - rc.y, O.z + C.z - rc.z);
+})();
+
+(function _initRotatePanel() {
+  const cb = document.getElementById('cb-rot');
+  cb?.addEventListener('change', e => _autoRotate = e.target.checked);
 })();
 
 // ── Bootstrap ────────────────────────────────────────────

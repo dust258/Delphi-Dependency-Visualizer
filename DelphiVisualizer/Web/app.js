@@ -1025,6 +1025,13 @@ function toggleHelp() {
 }
 window.showHelp = () => document.getElementById('help-modal').classList.add('visible');
 
+window.setFullscreenMode = function(on) {
+  ['info-panel', 'cycle-panel'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = on ? 'none' : '';
+  });
+};
+
 document.addEventListener('keydown', ev => {
   if (ev.target.tagName === 'INPUT' || ev.target.tagName === 'TEXTAREA') return;
   if (ev.key === '?' || ev.key === 'F1') { toggleHelp(); ev.preventDefault(); return; }

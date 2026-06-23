@@ -696,6 +696,7 @@ public partial class MainWindow : Window
             WindowStyle = WindowStyle.None;
             ResizeMode  = ResizeMode.NoResize;
             WindowState = WindowState.Maximized;
+            _ = WebView.ExecuteScriptAsync("setFullscreenMode(true)");
         }
         else
         {
@@ -709,6 +710,7 @@ public partial class MainWindow : Window
             WindowStyle = WindowStyle.SingleBorderWindow;
             ResizeMode  = ResizeMode.CanResize;
             WindowState = _prevWindowState;
+            _ = WebView.ExecuteScriptAsync("setFullscreenMode(false)");
         }
     }
 

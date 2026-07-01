@@ -1,5 +1,7 @@
 #define MyAppName      "Delphi Dependency Visualizer"
-#define MyAppVersion   "1.0"
+#ifndef MyAppVersion
+  #define MyAppVersion "1.0"
+#endif
 #define MyAppPublisher "Michael Bröker"
 #define MyAppContact   "dust258@gmail.com"
 #define MyAppExeName   "DelphiVisualizer.exe"

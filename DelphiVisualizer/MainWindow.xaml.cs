@@ -58,6 +58,8 @@ public partial class MainWindow : Window
     // Für LocalizationManager.NotifyWebViewAsync
     public bool IsWebViewReady => _webViewReady;
 
+    public SplashWindow? SplashWindow { get; set; }
+
     private void SaveSettings()
     {
         try
@@ -122,6 +124,8 @@ public partial class MainWindow : Window
         {
             await Task.Delay(300);
             _webViewReady = true;
+            SplashWindow?.CloseSplash();
+            SplashWindow = null;
 
             // Sprache ins WebView propagieren
             await LocalizationManager.SendToWebViewAsync(WebView);

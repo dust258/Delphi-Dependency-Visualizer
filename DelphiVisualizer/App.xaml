@@ -1,7 +1,7 @@
 <Application x:Class="DelphiVisualizer.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             StartupUri="MainWindow.xaml">
+             Startup="OnStartup">
   <Application.Resources>
     <SolidColorBrush x:Key="BgPrimary">#0A0E1A</SolidColorBrush>
     <SolidColorBrush x:Key="BgPanel">#10162A</SolidColorBrush>

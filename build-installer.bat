@@ -16,6 +16,17 @@ if not exist "%ISCC%" (
     exit /b 1
 )
 
+REM Version aus .csproj lesen
+for /f "usebackq delims=" %%v in (`powershell -NoProfile -Command "(([xml](Get-Content '%~dp0DelphiVisualizer\DelphiVisualizer.csproj')).Project.PropertyGroup.Version)"`) do set VERSION=%%v
+
+if "%VERSION%"=="" (
+    echo FEHLER: Version konnte nicht aus .csproj gelesen werden.
+    exit /b 1
+)
+
+echo Version: %VERSION%
+echo.
+
 echo [1/2] Erstelle Self-Contained-Build...
 call "%~dp0publish.bat"
 if not exist "%~dp0publish\DelphiVisualizer.exe" (
@@ -26,7 +37,7 @@ if not exist "%~dp0publish\DelphiVisualizer.exe" (
 echo.
 echo [2/2] Erstelle Installer...
 if not exist "%~dp0installer" mkdir "%~dp0installer"
-"%ISCC%" "%~dp0setup.iss"
+"%ISCC%" /DMyAppVersion=%VERSION% "%~dp0setup.iss"
 if errorlevel 1 (
     echo FEHLER beim Erstellen des Installers.
     exit /b 1
@@ -34,6 +45,6 @@ if errorlevel 1 (
 
 echo.
 echo ============================================
-echo  Fertig: installer\DelphiVisualizer-1.0-Setup.exe
+echo  Fertig: installer\DelphiVisualizer-%VERSION%-Setup.exe
 echo ============================================
 endlocal

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Delphi Dependency Visualizer</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- 3d-force-graph (lokal, bündelt Three.js) -->
+  <script src="3d-force-graph.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <div id="graph-container"></div>
+  </div>
+
+  <!-- Info Panel (node details) -->
+  <div id="info-panel">
+    <h3 id="ip-name"></h3>
+    <div id="ip-badge" class="type-badge"></div>
+    <div class="info-row"><span data-i18n="panel.ifaceUses">Interface-Uses</span><span id="ip-iface"></span></div>
+    <div class="info-row"><span data-i18n="panel.implUses">Impl.-Uses</span><span id="ip-impl"></span></div>
+    <div class="info-row"><span data-i18n="panel.incomingDeps">Eingehende Deps</span><span id="ip-in"></span></div>
+    <p class="info-filepath" id="ip-path"></p>
+    <div id="ip-cycle" class="cycle-warning" style="display:none" data-i18n="panel.cycleWarning">⚠ Teil eines Zyklus</div>
+  </div>
+
+  <!-- Stats -->
+  <div id="stats-overlay">
+    <b id="st-units">0</b> <span data-i18n="stats.units">Units</span> &nbsp;·&nbsp;
+    <b id="st-edges">0</b> <span data-i18n="stats.edges">Edges</span> &nbsp;·&nbsp;
+    <b id="st-cycles">0</b> <span data-i18n="stats.cycles">Zyklen</span>
+  </div>
+
+  <!-- Rotate panel -->
+  <div id="rotate-panel">
+    <div class="nav-title" data-i18n="rotate.title">Drehen</div>
+    <label class="rotate-opt">
+      <input type="checkbox" id="cb-rot">
+      <span data-i18n="rotate.auto">Automatisch drehen</span>
+    </label>
+  </div>
+
+  <!-- Navigation panel -->
+  <div id="nav-panel">
+    <div class="nav-title">Navigation</div>
+    <div class="nav-body">
+
+      <!-- Bewegung (QE + RF + AD) -->
+      <div class="nav-group">
+        <div class="nav-row">
+          <button class="nav-btn" data-key="q" data-i18n-title="nav.rollLeft">↺</button>
+          <button class="nav-btn" data-key="r" data-i18n-title="nav.ascend">⬆</button>
+          <button class="nav-btn" data-key="e" data-i18n-title="nav.rollRight">↻</button>
+        </div>
+        <div class="nav-row">
+          <button class="nav-btn" data-key="a" data-i18n-title="nav.strafeLeft">◀</button>
+          <button class="nav-btn" data-key="f" data-i18n-title="nav.descend">⬇</button>
+          <button class="nav-btn" data-key="d" data-i18n-title="nav.strafeRight">▶</button>
+        </div>
+      </div>
+
+      <div class="nav-divider"></div>
+
+      <!-- Vorwärts / Rückwärts (WS) — eigene Mittelspalte -->
+      <div class="nav-group nav-group-vert">
+        <button class="nav-btn" data-key="w" data-i18n-title="nav.forward">＋</button>
+        <button class="nav-btn" data-key="s" data-i18n-title="nav.backward">－</button>
+      </div>
+
+      <div class="nav-divider"></div>
+
+      <!-- Blickrichtung (Pfeiltasten) -->
+      <div class="nav-group">
+        <div class="nav-row">
+          <span   class="nav-gap"></span>
+          <button class="nav-btn nav-look" data-key="arrowup"    data-i18n-title="nav.lookUp">↑</button>
+          <span   class="nav-gap"></span>
+        </div>
+        <div class="nav-row">
+          <button class="nav-btn nav-look" data-key="arrowleft"  data-i18n-title="nav.lookLeft">←</button>
+          <button class="nav-btn nav-look" data-key="arrowdown"  data-i18n-title="nav.lookDown">↓</button>
+          <button class="nav-btn nav-look" data-key="arrowright" data-i18n-title="nav.lookRight">→</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Cycle list -->
+  <div id="cycle-panel">
+    <h4 data-i18n="cyclespanel.heading">⚠ Zirkuläre Abhängigkeiten</h4>
+    <div id="cycle-list"></div>
+  </div>
+
+  <!-- Legend -->
+  <div id="legend">
+    <div class="legend-item">
+      <span class="legend-gradient"></span>
+      <span style="color:#607080" data-i18n="legend.fewUses">wenig Uses</span>
+      <span style="margin:0 4px;color:#8899BB">→</span>
+      <span style="color:#FF2020" data-i18n="legend.manyUses">viele Uses</span>
+    </div>
+  </div>
+
+  <!-- Help modal -->
+  <div id="help-modal" onclick="if(event.target===this)toggleHelp()">
+    <div id="help-content">
+      <button class="help-close" onclick="toggleHelp()">✕</button>
+      <h2 data-i18n="help.title">Steuerung</h2>
+
+      <h3 data-i18n="help.sectionKeyboardNav">Tastatur — Navigation</h3>
+      <table class="help-table">
+        <tr><td><kbd>W</kbd> / <kbd>S</kbd></td><td data-i18n="help.keyForward">Vorwärts / Rückwärts</td></tr>
+        <tr><td><kbd>A</kbd> / <kbd>D</kbd></td><td data-i18n="help.keyStrafeLeftRight">Links / Rechts (seitwärts)</td></tr>
+        <tr><td><kbd>Q</kbd> / <kbd>E</kbd></td><td data-i18n="help.keyRoll">Rollen links / rechts</td></tr>
+        <tr><td><kbd>R</kbd> / <kbd>F</kbd></td><td data-i18n="help.keyUpDown">Aufsteigen / Absenken</td></tr>
+        <tr><td><kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd></td><td data-i18n="help.keyArrows">Blickrichtung neigen / schwenken</td></tr>
+        <tr><td><kbd>Shift</kbd> + Taste</td><td data-i18n="help.keyShift">3× Geschwindigkeit</td></tr>
+      </table>
+
+      <h3 data-i18n="help.sectionMouse">Maus</h3>
+      <table class="help-table">
+        <tr><td>Linke Taste + Ziehen</td><td data-i18n="help.mouseLDrag">Orbit (Kamera drehen)</td></tr>
+        <tr><td>Rechte Taste + Ziehen</td><td data-i18n="help.mouseRDrag">Pan (Verschieben)</td></tr>
+        <tr><td>Mausrad</td><td data-i18n="help.mouseWheel">Vorwärts / Rückwärts (unbegrenzt)</td></tr>
+        <tr><td>Shift + Mausrad</td><td data-i18n="help.mouseShiftWheel">3× schneller</td></tr>
+        <tr><td>Klick auf Unit</td><td data-i18n="help.mouseClickNode">Unit auswählen + Abhängigkeiten hervorheben</td></tr>
+        <tr><td>Klick auf Hintergrund</td><td data-i18n="help.mouseClickBg">Auswahl aufheben</td></tr>
+      </table>
+
+      <p class="help-hint"><kbd>?</kbd> — <span data-i18n="help.keyHint">diesen Dialog öffnen / schließen</span></p>
+
+      <div class="help-about">
+        <span data-i18n="help.aboutVersion">Delphi Dependency Visualizer v1.0</span>
+        <span>Michael Bröker &nbsp;·&nbsp; <a href="mailto:dust258@gmail.com">dust258@gmail.com</a></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div id="loading">
+    <div class="spinner"></div>
+    <p id="loading-text">Analysiere Abhängigkeiten…</p>
+  </div>
+
+  <!-- Error display -->
+  <div id="load-error">
+    <div data-i18n="error.libraryLoad">⚠ Fehler beim Laden der 3D-Bibliothek</div>
+    <code id="load-error-msg"></code>
+    <div style="color:#8899BB;font-size:12px" data-i18n="error.devtools">Drücke F12 für Details in den DevTools</div>
+  </div>
+
+<script src="app.js"></script>
+</body>
+</html>

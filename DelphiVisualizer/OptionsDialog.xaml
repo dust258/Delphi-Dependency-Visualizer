@@ -1,0 +1,93 @@
+<Window x:Class="DelphiVisualizer.OptionsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:s="clr-namespace:DelphiVisualizer.Services"
+        Title="{s:L options.title}"
+        Width="460" SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="#0A0E1A"
+        Foreground="#E0E6F0">
+  <Grid Margin="24,20,24,24">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="12"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="20"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+
+    <!-- Section: Darstellung -->
+    <TextBlock Grid.Row="0"
+               Text="{s:L options.sectionDisplay}"
+               Foreground="#607090" FontSize="9" FontWeight="SemiBold"
+               Margin="0,0,0,8"/>
+
+    <Border Grid.Row="1"
+            Background="#080C18" BorderBrush="#1E2D50" BorderThickness="1"
+            CornerRadius="6" Padding="14,12">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="12"/>
+          <ColumnDefinition Width="100"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+          <TextBlock Text="{s:L options.labelMaxNodes}" Foreground="#E0E6F0" FontSize="12"/>
+          <TextBlock Text="{s:L options.descMaxNodes}"
+                     Foreground="#607090" FontSize="10" Margin="0,3,0,0" TextWrapping="Wrap"/>
+        </StackPanel>
+        <TextBox x:Name="TbMaxNodes" Grid.Column="2"
+                 Style="{StaticResource SearchBox}"
+                 VerticalContentAlignment="Center" TextAlignment="Right"
+                 PreviewTextInput="TbMaxNodes_PreviewTextInput"
+                 PreviewKeyDown="TbMaxNodes_PreviewKeyDown"/>
+      </Grid>
+    </Border>
+
+    <!-- Section: Sprache -->
+    <TextBlock Grid.Row="3"
+               Text="{s:L options.labelLanguage}"
+               Foreground="#607090" FontSize="9" FontWeight="SemiBold"
+               Margin="0,0,0,8"/>
+
+    <Border Grid.Row="4"
+            Background="#080C18" BorderBrush="#1E2D50" BorderThickness="1"
+            CornerRadius="6" Padding="14,12">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="12"/>
+          <ColumnDefinition Width="140"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+          <TextBlock Text="{s:L options.labelLanguage}" Foreground="#E0E6F0" FontSize="12"/>
+          <TextBlock Text="{s:L options.descLanguage}"
+                     Foreground="#607090" FontSize="10" Margin="0,3,0,0" TextWrapping="Wrap"/>
+        </StackPanel>
+        <ComboBox x:Name="CbLanguage" Grid.Column="2"
+                  Style="{StaticResource UnitCombo}"
+                  MinWidth="0"
+                  VerticalAlignment="Center">
+          <ComboBoxItem Content="Deutsch"  Tag="de" Style="{StaticResource DarkComboItem}"/>
+          <ComboBoxItem Content="English"  Tag="en" Style="{StaticResource DarkComboItem}"/>
+          <ComboBoxItem Content="Français" Tag="fr" Style="{StaticResource DarkComboItem}"/>
+          <ComboBoxItem Content="Русский"  Tag="ru" Style="{StaticResource DarkComboItem}"/>
+        </ComboBox>
+      </Grid>
+    </Border>
+
+    <!-- Buttons -->
+    <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right">
+      <Button Content="{s:L options.btnCancel}" Style="{StaticResource LayoutButton}"
+              Width="90" Height="30" Margin="0,0,8,0"
+              Click="BtnCancel_Click"/>
+      <Button Content="{s:L options.btnOk}" Style="{StaticResource ToolbarButton}"
+              Width="80" Height="30"
+              Background="#1A3A5A" BorderBrush="#2A5A8A" Foreground="#64B5F6"
+              Click="BtnOk_Click" IsDefault="True"/>
+    </StackPanel>
+  </Grid>
+</Window>

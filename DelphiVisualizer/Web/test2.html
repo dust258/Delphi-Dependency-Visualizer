@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="3d-force-graph.min.js"></script>
+<style>body{margin:0;background:#0A0E1A;color:#fff;font-family:monospace}</style>
+</head>
+<body>
+<div id="info" style="position:fixed;top:10px;left:10px;z-index:99;background:rgba(0,0,0,0.7);padding:8px;font-size:11px"></div>
+<div id="g" style="width:100vw;height:100vh"></div>
+<script>
+// Simulate real app data: hierarchical graph with cycle
+const nodes = [
+  {id:'Root',color:'#FF6B6B',val:2},
+  {id:'A',color:'#4FC3F7',val:1},{id:'B',color:'#4FC3F7',val:1},{id:'C',color:'#4FC3F7',val:1},
+  {id:'D',color:'#A5D6A7',val:1},{id:'E',color:'#A5D6A7',val:1},{id:'F',color:'#A5D6A7',val:1},
+  {id:'G',color:'#A5D6A7',val:1},{id:'H',color:'#A5D6A7',val:1},{id:'I',color:'#A5D6A7',val:1},
+  {id:'CycleA',color:'#FF5252',val:1},{id:'CycleB',color:'#FF5252',val:1}
+];
+const links = [
+  {source:'Root',target:'A'},{source:'Root',target:'B'},{source:'Root',target:'C'},
+  {source:'A',target:'D'},{source:'A',target:'E'},{source:'A',target:'F'},
+  {source:'B',target:'G'},{source:'B',target:'H'},{source:'C',target:'I'},
+  {source:'CycleA',target:'CycleB'},{source:'CycleB',target:'CycleA'}, // cycle
+  {source:'Root',target:'CycleA'}
+];
+
+const cycleSet = new Set(['CycleA','CycleB']);
+
+const log = s => document.getElementById('info').innerHTML += s + '<br>';
+
+const G = ForceGraph3D()(document.getElementById('g'))
+  .backgroundColor('#0A0E1A')
+  .nodeColor(n => n.color)
+  .nodeVal(n => n.val * 3)
+  .nodeLabel(n => n.id)
+  .linkColor(() => '#64B5F6')
+  .linkDirectionalArrowLength(5)
+  .d3Force('center', null)
+  .d3AlphaDecay(0.02)
+  .d3VelocityDecay(0.3)
+  .dagMode('td')
+  .dagLevelDistance(120)
+  .dagNodeFilter(n => !cycleSet.has(n.id))
+  .onDagError(e => log('DAG ERR: ' + JSON.stringify(e)))
+  .graphData({nodes, links});
+
+log('dagMode: td, nodes: ' + nodes.length + ', cycleNodes: ' + cycleSet.size);
+setTimeout(() => { G.zoomToFit(800, 40); log('zoomToFit called'); }, 3000);
+</script>
+</body>
+</html>

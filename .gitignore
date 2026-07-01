@@ -1,0 +1,30 @@
+# Build output
+bin/
+obj/
+publish/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Rider
+.idea/
+
+# NuGet
+*.nupkg
+packages/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Logs / temp test files
+C:/temp/
+*.log
+
+# Installer output
+installer/
+
+# Claude project documentation (internal)
+CLAUDE.md

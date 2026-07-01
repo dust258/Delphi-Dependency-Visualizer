@@ -364,12 +364,7 @@ function initGraph() {
       cam.position.x += fwd.x * d;
       cam.position.y += fwd.y * d;
       cam.position.z += fwd.z * d;
-      if (ctrl?.target) {
-        ctrl.target.x += fwd.x * d;
-        ctrl.target.y += fwd.y * d;
-        ctrl.target.z += fwd.z * d;
-        ctrl.update();
-      }
+      if (ctrl) ctrl.update();
     }, { passive: false });
 
   } catch(e) {

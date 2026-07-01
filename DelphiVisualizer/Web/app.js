@@ -1020,6 +1020,12 @@ function toggleHelp() {
 }
 window.showHelp = () => document.getElementById('help-modal').classList.add('visible');
 
+window.setAppVersion = function(v) {
+  document.querySelectorAll('[data-i18n="help.aboutVersion"]').forEach(el => {
+    el.textContent = 'Delphi Dependency Visualizer ' + v;
+  });
+};
+
 window.setFullscreenMode = function(on) {
   ['info-panel', 'cycle-panel'].forEach(id => {
     const el = document.getElementById(id);

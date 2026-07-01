@@ -25,6 +25,7 @@ public partial class MainWindow : Window
     private List<string> _allUnitNames = new();
     private string _selectedUnit = "";
     private bool _suppressTextChange = false;
+    private bool _suppressDropdown = false;
 
     // Persistence
     private string? _currentProjectPath;
@@ -129,6 +130,9 @@ public partial class MainWindow : Window
 
             // Sprache ins WebView propagieren
             await LocalizationManager.SendToWebViewAsync(WebView);
+
+            var v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version!;
+            await WebView.ExecuteScriptAsync($"setAppVersion('v{v.Major}.{v.Minor}.{v.Build}\')");
 
             if (_pendingGraphJson != null)
             {
@@ -271,12 +275,29 @@ public partial class MainWindow : Window
         _suppressTextChange = false;
     }
 
+    private void BtnDropdownArrow_Click(object sender, RoutedEventArgs e)
+    {
+        if (UnitPopup.IsOpen)
+            UnitPopup.IsOpen = false;
+        else if (TbUnitSearch.IsKeyboardFocused)
+            ShowFilteredDropdown(TbUnitSearch.Text);
+        else
+            TbUnitSearch.Focus();
+    }
+
+    private void TbUnitSearch_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (TbUnitSearch.IsKeyboardFocused && !UnitPopup.IsOpen)
+            ShowFilteredDropdown(TbUnitSearch.Text);
+    }
+
     private void TbUnitSearch_GotFocus(object sender, RoutedEventArgs e)
     {
         UnitPickerBorder.BorderBrush = new SolidColorBrush(
             (Color)ColorConverter.ConvertFromString("#64B5F6"));
         TbUnitSearch.SelectAll();
-        ShowFilteredDropdown(TbUnitSearch.Text);
+        if (!_suppressDropdown)
+            ShowFilteredDropdown(TbUnitSearch.Text);
     }
 
     private void TbUnitSearch_LostFocus(object sender, RoutedEventArgs e)
@@ -399,7 +420,9 @@ public partial class MainWindow : Window
         SelectUnit(name);
         UnitPopup.IsOpen = false;
         BtnAnalyze.IsEnabled = true;
+        _suppressDropdown = true;
         TbUnitSearch.Focus();
+        _suppressDropdown = false;
     }
 
     private void RestoreSelection()

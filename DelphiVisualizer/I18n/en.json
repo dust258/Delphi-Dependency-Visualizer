@@ -88,7 +88,7 @@
   "help.mouseClickNode": "Select unit + highlight dependencies",
   "help.mouseClickBg": "Deselect",
   "help.keyHint": "? — open / close this dialog",
-  "help.aboutVersion": "Delphi Dependency Visualizer v1.0",
+  "help.aboutVersion": "Delphi Dependency Visualizer",
 
   "loading.analyzing": "Analysing dependencies…",
   "loading.computingLayout": "Computing layout…",

@@ -9,7 +9,7 @@
     <RootNamespace>DelphiVisualizer</RootNamespace>
     <AssemblyName>DelphiVisualizer</AssemblyName>
     <ApplicationIcon>app.ico</ApplicationIcon>
-    <Version>1.1.2</Version>
+    <Version>1.1.3</Version>
     <Company>Michael Bröker</Company>
     <Product>Delphi Dependency Visualizer</Product>
     <Copyright>© 2026 Michael Bröker</Copyright>

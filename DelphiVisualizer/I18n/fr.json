@@ -88,7 +88,7 @@
   "help.mouseClickNode": "Sélectionner l'unité + mettre en évidence les dépendances",
   "help.mouseClickBg": "Désélectionner",
   "help.keyHint": "? — ouvrir / fermer cette boîte de dialogue",
-  "help.aboutVersion": "Delphi Dependency Visualizer v1.0",
+  "help.aboutVersion": "Delphi Dependency Visualizer",
 
   "loading.analyzing": "Analyse des dépendances…",
   "loading.computingLayout": "Calcul de la disposition…",

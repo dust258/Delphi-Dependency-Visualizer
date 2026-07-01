@@ -8,6 +8,8 @@ public partial class SplashWindow : Window
     public SplashWindow()
     {
         InitializeComponent();
+        var v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version!;
+        TbVersion.Text = $"v{v.Major}.{v.Minor}.{v.Build}  ·  Michael Bröker";
         Loaded += (_, _) => BeginAnimation(OpacityProperty,
             new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(250)));
     }

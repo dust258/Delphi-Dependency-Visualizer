@@ -13,7 +13,7 @@
             <TextBlock Text="Delphi Dependency Visualizer"
                        FontSize="18" FontWeight="SemiBold" Foreground="#E8EAF0"
                        HorizontalAlignment="Center" Margin="0,0,0,4"/>
-            <TextBlock Text="v1.0  ·  Michael Bröker"
+            <TextBlock x:Name="TbVersion" Text="v?  ·  Michael Bröker"
                        FontSize="11" Foreground="#6B7280"
                        HorizontalAlignment="Center" Margin="0,0,0,20"/>
             <TextBlock x:Name="TbLoading" Text="Wird geladen …"

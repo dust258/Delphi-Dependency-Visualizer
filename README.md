@@ -24,9 +24,9 @@ Download the latest installer from [Releases](../../releases) and run it. No adm
 
 ## Usage
 
-1. Click **Projekt öffnen** and select a `.dpr` file
+1. Click **Open Project** and select a `.dpr` file
 2. Choose a start unit and analysis depth
-3. Click **Analysieren**
+3. Click **Analyse**
 4. Navigate with mouse: rotate, zoom, click nodes for details
 
 ## Build from source

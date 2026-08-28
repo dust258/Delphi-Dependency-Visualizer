@@ -11,17 +11,23 @@ public static class DependencyResolver
     public static DependencyGraph Resolve(
         string rootUnitName,
         Dictionary<string, ProjectUnit> projectUnits,
-        int maxDepth = int.MaxValue)
+        int maxDepth = int.MaxValue,
+        IProgress<(int done, int total)>? progress = null)
     {
         var graph = new DependencyGraph { RootUnit = rootUnitName };
         var colors = new Dictionary<string, Color>(StringComparer.OrdinalIgnoreCase);
         var grayStack = new Stack<string>();
         var edgeSet = new HashSet<string>();
 
-        // Parse all project units (cached on ProjectUnit after first call)
-        foreach (var unit in projectUnits.Values)
+        // Parse all project units (cached on ProjectUnit after first call).
+        // This disk-bound loop dominates the runtime on large projects, so it
+        // drives the loading progress bar.
+        var pending = projectUnits.Values.Where(u => u.FileFound).ToList();
+        int total = pending.Count, done = 0;
+        progress?.Report((0, total));
+
+        foreach (var unit in pending)
         {
-            if (!unit.FileFound) continue;
             if (unit.InterfaceUses.Count == 0 && unit.ImplementationUses.Count == 0)
             {
                 var (ifaceUses, implUses) = PasParser.Parse(unit.AbsolutePath);
@@ -29,6 +35,9 @@ public static class DependencyResolver
                 unit.ImplementationUses = implUses;
             }
             graph.Units[unit.Name] = unit;
+
+            if (++done % 25 == 0 || done == total)
+                progress?.Report((done, total));
         }
 
         if (!projectUnits.ContainsKey(rootUnitName))

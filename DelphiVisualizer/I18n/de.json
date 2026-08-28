@@ -31,6 +31,9 @@
   "status.loadError": "Fehler beim Laden",
 
   "sidebar.labelGraphFilter": "GRAPH-FILTER",
+  "sidebar.listCaption": "REFERENZIERTE UNITS",
+  "sidebar.ctxSelect": "Auswählen",
+  "sidebar.ctxOpen": "Öffnen (als Root-Unit)",
   "sidebar.cbFormsOnly": "Nur Formulare",
   "sidebar.cbSameDir": "Nur gleiches Verzeichnis",
   "sidebar.cbUsesFiltered": "Enthält gefilterte Units",
@@ -42,7 +45,7 @@
   "sidebar.unitCount": "{0} / {1} Units",
 
   "filedialog.openTitle": "Delphi-Projekt öffnen",
-  "filedialog.openFilter": "Delphi-Projekt (*.dpr)|*.dpr",
+  "filedialog.openFilter": "Alle unterstützten (*.dpr;*.gv;*.dot)|*.dpr;*.gv;*.dot|Delphi-Projekt (*.dpr)|*.dpr|GraphViz-Export (*.gv;*.dot)|*.gv;*.dot",
 
   "options.title": "Optionen — Delphi Visualizer",
   "options.sectionDisplay": "DARSTELLUNG",
@@ -53,6 +56,9 @@
   "options.btnOk": "OK",
   "options.btnCancel": "Abbrechen",
   "options.validationMaxNodes": "Bitte eine gültige Zahl (mindestens 100) eingeben.",
+
+  "findunit.title": "Unit suchen",
+  "findunit.btnSelect": "Übernehmen",
 
   "errors.title": "Fehler",
   "errors.loadFailed": "Fehler beim Laden:\n{0}",
@@ -91,6 +97,7 @@
   "help.aboutVersion": "Delphi Dependency Visualizer",
 
   "loading.analyzing": "Analysiere Abhängigkeiten…",
+  "loading.parsing": "Analysiere Units {0} / {1}…",
   "loading.computingLayout": "Berechne Layout…",
 
   "error.libraryLoad": "⚠ Fehler beim Laden der 3D-Bibliothek",

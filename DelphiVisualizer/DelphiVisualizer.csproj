@@ -9,7 +9,7 @@
     <RootNamespace>DelphiVisualizer</RootNamespace>
     <AssemblyName>DelphiVisualizer</AssemblyName>
     <ApplicationIcon>app.ico</ApplicationIcon>
-    <Version>1.1.5</Version>
+    <Version>1.2.0</Version>
     <Company>Michael Bröker</Company>
     <Product>Delphi Dependency Visualizer</Product>
     <Copyright>© 2026 Michael Bröker</Copyright>
@@ -30,6 +30,14 @@
     </Content>
     <Content Include="I18n\**">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+
+    <!-- Bundled demo project — shipped so users have something tangled to open
+         without pointing at their own source. Lives at repo root; linked into
+         the output tree under SampleProject\AcmeERP\. -->
+    <Content Include="..\SampleProject\AcmeERP\**\*">
+      <Link>SampleProject\AcmeERP\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 

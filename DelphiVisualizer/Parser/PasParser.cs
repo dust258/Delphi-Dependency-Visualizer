@@ -5,8 +5,9 @@ namespace DelphiVisualizer.Parser;
 
 public static class PasParser
 {
+    // Unit name may be dotted (namespaced): Favoriten.Akquise, System.SysUtils …
     private static readonly Regex UnitNameRegex =
-        new(@"^\s*(\w+)", RegexOptions.Compiled);
+        new(@"^\s*([\w.]+)", RegexOptions.Compiled);
 
     public static (List<string> InterfaceUses, List<string> ImplementationUses) Parse(string filePath)
     {
@@ -81,8 +82,8 @@ public static class PasParser
             var nameMatch = UnitNameRegex.Match(trimmed);
             if (!nameMatch.Success) continue;
 
-            var name = nameMatch.Groups[1].Value;
-            if (!string.IsNullOrEmpty(name) && !IsKeyword(name))
+            var name = nameMatch.Groups[1].Value.Trim('.');
+            if (!string.IsNullOrEmpty(name) && !IsKeyword(name) && name.Any(char.IsLetterOrDigit))
                 result.Add(name);
         }
 

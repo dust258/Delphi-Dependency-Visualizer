@@ -58,11 +58,35 @@ function showError(msg) {
 
 window.showLoading = function(text) {
   document.getElementById('loading-text').textContent = text || 'Analysiere…';
+  setLoadingProgress(-1);
+  document.getElementById('loading').classList.add('visible');
+};
+
+// pct < 0 → indeterminate (bar hidden, spinner only); 0..100 → determinate bar
+function setLoadingProgress(pct) {
+  const wrap = document.getElementById('loading-progress');
+  const bar = document.getElementById('loading-bar');
+  if (!wrap || !bar) return;
+  if (typeof pct !== 'number' || pct < 0) {
+    wrap.classList.remove('visible');
+    bar.style.width = '0%';
+  } else {
+    wrap.classList.add('visible');
+    bar.style.width = Math.max(0, Math.min(100, pct)) + '%';
+  }
+}
+
+// Called from C# during dependency analysis: text + 0..100 percentage
+window.updateLoading = function(text, pct) {
+  const el = document.getElementById('loading-text');
+  if (el && text) el.textContent = text;
+  if (pct !== undefined) setLoadingProgress(pct);
   document.getElementById('loading').classList.add('visible');
 };
 
 function hideLoading() {
   document.getElementById('loading').classList.remove('visible');
+  setLoadingProgress(-1);
 }
 
 // ── Layout computation ───────────────────────────────────
@@ -629,6 +653,20 @@ window.loadGraph = function(data) {
   }, 30);
 };
 
+// Wipe the current graph + selection so a newly opened project doesn't leave
+// the previous project's graph on screen until the next Analyse.
+window.clearGraph = function() {
+  selectedNode = null;
+  highlightNodeIds.clear();
+  currentData = null;
+  cycleNodeSet = new Set();
+  hideInfoPanel();
+  const cp = document.getElementById('cycle-panel');
+  if (cp) cp.classList.remove('visible');
+  if (Graph) Graph.graphData({ nodes: [], links: [] });
+  hideLoading();
+};
+
 // Force node meshes (and link lines) onto the computed node.x/y/z positions.
 // Works even when the physics engine isn't ticking.
 let _lastSyncStats = { nodes: 0, links: 0 };
@@ -874,6 +912,16 @@ function _applyLayoutResult(mode, nodes, links) {
     Graph.cooldownTime(15000);
 
     Graph.graphData({ nodes, links });
+
+    // Fresh graph: drop any stale highlight closure from the previous graph
+    // (otherwise its "black-out non-lit" nodeColor accessor paints this one),
+    // then select the root so the opened tree is lit and the root is marked.
+    selectedNode = null;
+    highlightNodeIds.clear();
+    const _rootId = currentData?.rootUnit;
+    const _rootNode = _rootId ? nodes.find(n => (n._origId || n.id) === _rootId) : null;
+    if (_rootNode) selectNode(_rootNode);
+    else applyHighlight();
 
     // Stats & overlays
     const stats = currentData?.stats || {};

@@ -1,0 +1,1042 @@
+digraph AcmeERP {
+      AcmeERP -> { uKernelExceptions uKernelUtils uKernelConfig uKernelLog uKernelEvents uKernelContainer uAppContext uDomTypes uDomAddress uDomUser uDomCustomer uDomCustomerDetail uDomOrder uDomOrderDetail uDomProduct uDomProductDetail uDomInvoice uDomInvoiceDetail uDomShipment uDomShipmentDetail uDomPayment uDomPaymentDetail uDomSupplier uDomSupplierDetail uDomWarehouse uDomWarehouseDetail uDomCategory uDomCategoryDetail uDomDiscount uDomDiscountDetail uDomTax uDomTaxDetail uDomCurrency uDomCurrencyDetail uDomContract uDomContractDetail uDomQuotation uDomQuotationDetail uDomReturn uDomReturnDetail uDomRefund uDomRefundDetail uDomInventory uDomInventoryDetail uDomStock uDomStockDetail uDomPricing uDomPricingDetail uDomCampaign uDomCampaignDetail uDomLead uDomLeadDetail uDomOpportunity uDomOpportunityDetail uDomContact uDomContactDetail uDomAccount uDomAccountDetail uDomTicket uDomTicketDetail uDomProject uDomProjectDetail uDomTask uDomTaskDetail uDomTimesheet uDomTimesheetDetail uDomExpense uDomExpenseDetail uDomBudget uDomBudgetDetail uDomLedger uDomLedgerDetail uDomJournal uDomJournalDetail uDomAsset uDomAssetDetail uDomDepreciation uDomDepreciationDetail uDomPayroll uDomPayrollDetail uDomEmployee uDomEmployeeDetail uDomDepartment uDomDepartmentDetail uDomRole uDomRoleDetail uDomPermission uDomPermissionDetail uDomNotification uDomNotificationDetail uDomReport uDomReportDetail uDomDashboard uDomDashboardDetail uDomAudit uDomAuditDetail uDomSetting uDomSettingDetail uDomImport uDomImportDetail uDomExport uDomExportDetail uDomBatch uDomBatchDetail uDomSchedule uDomScheduleDetail uDomReminder uDomReminderDetail uDomDocument uDomDocumentDetail uDbConnection uDbRepository uDbUserRepo uDbCustomerRepo uDbOrderRepo uDbProductRepo uDbInvoiceRepo uDbShipmentRepo uDbPaymentRepo uDbSupplierRepo uDbWarehouseRepo uDbCategoryRepo uDbDiscountRepo uDbTaxRepo uDbCurrencyRepo uDbContractRepo uDbQuotationRepo uDbReturnRepo uDbRefundRepo uDbInventoryRepo uDbStockRepo uDbPricingRepo uDbCampaignRepo uDbLeadRepo uDbOpportunityRepo uDbContactRepo uDbAccountRepo uDbTicketRepo uDbProjectRepo uDbTaskRepo uDbTimesheetRepo uDbExpenseRepo uDbBudgetRepo uDbLedgerRepo uDbJournalRepo uDbAssetRepo uDbDepreciationRepo uDbPayrollRepo uDbEmployeeRepo uDbDepartmentRepo uDbRoleRepo uDbPermissionRepo uDbNotificationRepo uDbReportRepo uDbDashboardRepo uDbAuditRepo uDbSettingRepo uDbImportRepo uDbExportRepo uDbBatchRepo uDbScheduleRepo uDbReminderRepo uDbDocumentRepo uSvcAuth uSvcNotification uSvcReport uSvcCustomer uSvcOrder uSvcProduct uSvcInvoice uSvcShipment uSvcPayment uSvcSupplier uSvcWarehouse uSvcCategory uSvcDiscount uSvcTax uSvcCurrency uSvcContract uSvcQuotation uSvcReturn uSvcRefund uSvcInventory uSvcStock uSvcPricing uSvcCampaign uSvcLead uSvcOpportunity uSvcContact uSvcAccount uSvcTicket uSvcProject uSvcTask uSvcTimesheet uSvcExpense uSvcBudget uSvcLedger uSvcJournal uSvcAsset uSvcDepreciation uSvcPayroll uSvcEmployee uSvcDepartment uSvcRole uSvcPermission uSvcDashboard uSvcAudit uSvcSetting uSvcImport uSvcExport uSvcBatch uSvcSchedule uSvcReminder uSvcDocument dmMain dmCustomer dmOrder dmProduct dmInvoice dmShipment dmPayment dmSupplier dmWarehouse dmCategory dmDiscount dmTax dmCurrency dmContract dmQuotation dmReturn dmRefund dmInventory dmStock dmPricing dmCampaign dmLead dmOpportunity dmContact dmAccount dmTicket dmProject dmTask dmTimesheet dmExpense dmBudget dmLedger dmJournal dmAsset dmDepreciation dmPayroll dmEmployee dmDepartment dmRole dmPermission dmNotification dmReport dmDashboard dmAudit dmSetting dmImport dmExport dmBatch dmSchedule dmReminder dmDocument frmAuditLog frmAddress frmCustomerList frmCustomerEdit frmOrderList frmOrderEdit frmProductList frmProductEdit frmInvoiceList frmInvoiceEdit frmShipmentList frmShipmentEdit frmPaymentList frmPaymentEdit frmSupplierList frmSupplierEdit frmWarehouseList frmWarehouseEdit frmCategoryList frmCategoryEdit frmDiscountList frmDiscountEdit frmTaxList frmTaxEdit frmCurrencyList frmCurrencyEdit frmContractList frmContractEdit frmQuotationList frmQuotationEdit frmReturnList frmReturnEdit frmRefundList frmRefundEdit frmInventoryList frmInventoryEdit frmStockList frmStockEdit frmPricingList frmPricingEdit frmCampaignList frmCampaignEdit frmLeadList frmLeadEdit frmOpportunityList frmOpportunityEdit frmContactList frmContactEdit frmAccountList frmAccountEdit frmTicketList frmTicketEdit frmProjectList frmProjectEdit frmTaskList frmTaskEdit frmTimesheetList frmTimesheetEdit frmExpenseList frmExpenseEdit frmBudgetList frmBudgetEdit frmLedgerList frmLedgerEdit frmJournalList frmJournalEdit frmAssetList frmAssetEdit frmDepreciationList frmDepreciationEdit frmPayrollList frmPayrollEdit frmEmployeeList frmEmployeeEdit frmDepartmentList frmDepartmentEdit frmRoleList frmRoleEdit frmPermissionList frmPermissionEdit frmNotificationList frmNotificationEdit frmReportList frmReportEdit frmDashboardList frmDashboardEdit frmAuditList frmAuditEdit frmSettingList frmSettingEdit frmImportList frmImportEdit frmExportList frmExportEdit frmBatchList frmBatchEdit frmScheduleList frmScheduleEdit frmReminderList frmReminderEdit frmDocumentList frmDocumentEdit fCustomer fCustomerEdit fCustomerReport fOrder fOrderEdit fOrderReport fProduct fProductEdit fProductReport fInvoice fInvoiceEdit fInvoiceReport fShipment fShipmentEdit fShipmentReport fPayment fPaymentEdit fPaymentReport fSupplier fSupplierEdit fSupplierReport fWarehouse fWarehouseEdit fWarehouseReport fCategory fCategoryEdit fCategoryReport fDiscount fDiscountEdit fDiscountReport fTax fTaxEdit fTaxReport fCurrency fCurrencyEdit fCurrencyReport fContract fContractEdit fContractReport fQuotation fQuotationEdit fQuotationReport fReturn fReturnEdit fReturnReport fRefund fRefundEdit fRefundReport fInventory fInventoryEdit fInventoryReport fStock fStockEdit fStockReport fPricing fPricingEdit fPricingReport fCampaign fCampaignEdit fCampaignReport fLead fLeadEdit fLeadReport fOpportunity fOpportunityEdit fOpportunityReport fContact fContactEdit fContactReport fAccount fAccountEdit fAccountReport fTicket fTicketEdit fTicketReport fProject fProjectEdit fProjectReport fTask fTaskEdit fTaskReport fTimesheet fTimesheetEdit fTimesheetReport fExpense fExpenseEdit fExpenseReport fBudget fBudgetEdit fBudgetReport fLedger fLedgerEdit fLedgerReport fJournal fJournalEdit fJournalReport fAsset fAssetEdit fAssetReport fDepreciation fDepreciationEdit fDepreciationReport fPayroll fPayrollEdit fPayrollReport fEmployee fEmployeeEdit fEmployeeReport fDepartment fDepartmentEdit fDepartmentReport fRole fRoleEdit fRoleReport fPermission fPermissionEdit fPermissionReport fNotification fNotificationEdit fNotificationReport fReport fReportEdit fReportReport fDashboard fDashboardEdit fDashboardReport fAudit fAuditEdit fAuditReport fSetting fSettingEdit fSettingReport fImport fImportEdit fImportReport fExport fExportEdit fExportReport fBatch fBatchEdit fBatchReport fSchedule fScheduleEdit fScheduleReport fReminder fReminderEdit fReminderReport fDocument fDocumentEdit fDocumentReport fSplash fAbout fLogin fSettings fUserAdmin fMain }
+      uKernelExceptions
+      uKernelUtils -> { uKernelConfig uKernelExceptions } [arrowhead=open,style=dashed]
+      uKernelConfig -> { uKernelExceptions }
+      uKernelConfig -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uKernelLog -> { uKernelConfig }
+      uKernelLog -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uKernelEvents -> { uKernelLog } [arrowhead=open,style=dashed]
+      uKernelContainer -> { uKernelExceptions }
+      uKernelContainer -> { uKernelLog uKernelConfig } [arrowhead=open,style=dashed]
+      uAppContext -> { fMain }
+      uAppContext -> { uKernelLog uKernelConfig } [arrowhead=open,style=dashed]
+      uDomTypes
+      uDomAddress -> { uDomTypes }
+      uDomAddress -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomUser -> { uDomTypes }
+      uDomUser -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomCustomer -> { uDomTypes }
+      uDomCustomer -> { uKernelUtils uDomOrder } [arrowhead=open,style=dashed]
+      uDomCustomerDetail -> { uDomTypes uDomCustomer }
+      uDomCustomerDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomOrder -> { uDomTypes }
+      uDomOrder -> { uKernelUtils uDomCustomer } [arrowhead=open,style=dashed]
+      uDomOrderDetail -> { uDomTypes uDomOrder }
+      uDomOrderDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomProduct -> { uDomTypes }
+      uDomProduct -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomProductDetail -> { uDomTypes uDomProduct }
+      uDomProductDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomInvoice -> { uDomTypes }
+      uDomInvoice -> { uKernelUtils uDomShipment } [arrowhead=open,style=dashed]
+      uDomInvoiceDetail -> { uDomTypes uDomInvoice }
+      uDomInvoiceDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomShipment -> { uDomTypes }
+      uDomShipment -> { uKernelUtils uDomInvoice } [arrowhead=open,style=dashed]
+      uDomShipmentDetail -> { uDomTypes uDomShipment }
+      uDomShipmentDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomPayment -> { uDomTypes }
+      uDomPayment -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomPaymentDetail -> { uDomTypes uDomPayment }
+      uDomPaymentDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomSupplier -> { uDomTypes }
+      uDomSupplier -> { uKernelUtils uDomWarehouse } [arrowhead=open,style=dashed]
+      uDomSupplierDetail -> { uDomTypes uDomSupplier }
+      uDomSupplierDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomWarehouse -> { uDomTypes }
+      uDomWarehouse -> { uKernelUtils uDomSupplier } [arrowhead=open,style=dashed]
+      uDomWarehouseDetail -> { uDomTypes uDomWarehouse }
+      uDomWarehouseDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomCategory -> { uDomTypes }
+      uDomCategory -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomCategoryDetail -> { uDomTypes uDomCategory }
+      uDomCategoryDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomDiscount -> { uDomTypes }
+      uDomDiscount -> { uKernelUtils uDomTax } [arrowhead=open,style=dashed]
+      uDomDiscountDetail -> { uDomTypes uDomDiscount }
+      uDomDiscountDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomTax -> { uDomTypes }
+      uDomTax -> { uKernelUtils uDomDiscount } [arrowhead=open,style=dashed]
+      uDomTaxDetail -> { uDomTypes uDomTax }
+      uDomTaxDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomCurrency -> { uDomTypes }
+      uDomCurrency -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomCurrencyDetail -> { uDomTypes uDomCurrency }
+      uDomCurrencyDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomContract -> { uDomTypes }
+      uDomContract -> { uKernelUtils uDomQuotation } [arrowhead=open,style=dashed]
+      uDomContractDetail -> { uDomTypes uDomContract }
+      uDomContractDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomQuotation -> { uDomTypes }
+      uDomQuotation -> { uKernelUtils uDomContract } [arrowhead=open,style=dashed]
+      uDomQuotationDetail -> { uDomTypes uDomQuotation }
+      uDomQuotationDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomReturn -> { uDomTypes }
+      uDomReturn -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomReturnDetail -> { uDomTypes uDomReturn }
+      uDomReturnDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomRefund -> { uDomTypes }
+      uDomRefund -> { uKernelUtils uDomInventory } [arrowhead=open,style=dashed]
+      uDomRefundDetail -> { uDomTypes uDomRefund }
+      uDomRefundDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomInventory -> { uDomTypes }
+      uDomInventory -> { uKernelUtils uDomRefund } [arrowhead=open,style=dashed]
+      uDomInventoryDetail -> { uDomTypes uDomInventory }
+      uDomInventoryDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomStock -> { uDomTypes }
+      uDomStock -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomStockDetail -> { uDomTypes uDomStock }
+      uDomStockDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomPricing -> { uDomTypes }
+      uDomPricing -> { uKernelUtils uDomCampaign } [arrowhead=open,style=dashed]
+      uDomPricingDetail -> { uDomTypes uDomPricing }
+      uDomPricingDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomCampaign -> { uDomTypes }
+      uDomCampaign -> { uKernelUtils uDomPricing } [arrowhead=open,style=dashed]
+      uDomCampaignDetail -> { uDomTypes uDomCampaign }
+      uDomCampaignDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomLead -> { uDomTypes }
+      uDomLead -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomLeadDetail -> { uDomTypes uDomLead }
+      uDomLeadDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomOpportunity -> { uDomTypes }
+      uDomOpportunity -> { uKernelUtils uDomContact } [arrowhead=open,style=dashed]
+      uDomOpportunityDetail -> { uDomTypes uDomOpportunity }
+      uDomOpportunityDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomContact -> { uDomTypes }
+      uDomContact -> { uKernelUtils uDomOpportunity } [arrowhead=open,style=dashed]
+      uDomContactDetail -> { uDomTypes uDomContact }
+      uDomContactDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomAccount -> { uDomTypes }
+      uDomAccount -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomAccountDetail -> { uDomTypes uDomAccount }
+      uDomAccountDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomTicket -> { uDomTypes }
+      uDomTicket -> { uKernelUtils uDomProject } [arrowhead=open,style=dashed]
+      uDomTicketDetail -> { uDomTypes uDomTicket }
+      uDomTicketDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomProject -> { uDomTypes }
+      uDomProject -> { uKernelUtils uDomTicket } [arrowhead=open,style=dashed]
+      uDomProjectDetail -> { uDomTypes uDomProject }
+      uDomProjectDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomTask -> { uDomTypes }
+      uDomTask -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomTaskDetail -> { uDomTypes uDomTask }
+      uDomTaskDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomTimesheet -> { uDomTypes }
+      uDomTimesheet -> { uKernelUtils uDomExpense } [arrowhead=open,style=dashed]
+      uDomTimesheetDetail -> { uDomTypes uDomTimesheet }
+      uDomTimesheetDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomExpense -> { uDomTypes }
+      uDomExpense -> { uKernelUtils uDomTimesheet } [arrowhead=open,style=dashed]
+      uDomExpenseDetail -> { uDomTypes uDomExpense }
+      uDomExpenseDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomBudget -> { uDomTypes }
+      uDomBudget -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomBudgetDetail -> { uDomTypes uDomBudget }
+      uDomBudgetDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomLedger -> { uDomTypes }
+      uDomLedger -> { uKernelUtils uDomJournal } [arrowhead=open,style=dashed]
+      uDomLedgerDetail -> { uDomTypes uDomLedger }
+      uDomLedgerDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomJournal -> { uDomTypes }
+      uDomJournal -> { uKernelUtils uDomLedger } [arrowhead=open,style=dashed]
+      uDomJournalDetail -> { uDomTypes uDomJournal }
+      uDomJournalDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomAsset -> { uDomTypes }
+      uDomAsset -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomAssetDetail -> { uDomTypes uDomAsset }
+      uDomAssetDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomDepreciation -> { uDomTypes }
+      uDomDepreciation -> { uKernelUtils uDomPayroll } [arrowhead=open,style=dashed]
+      uDomDepreciationDetail -> { uDomTypes uDomDepreciation }
+      uDomDepreciationDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomPayroll -> { uDomTypes }
+      uDomPayroll -> { uKernelUtils uDomDepreciation } [arrowhead=open,style=dashed]
+      uDomPayrollDetail -> { uDomTypes uDomPayroll }
+      uDomPayrollDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomEmployee -> { uDomTypes }
+      uDomEmployee -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomEmployeeDetail -> { uDomTypes uDomEmployee }
+      uDomEmployeeDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomDepartment -> { uDomTypes }
+      uDomDepartment -> { uKernelUtils uDomRole } [arrowhead=open,style=dashed]
+      uDomDepartmentDetail -> { uDomTypes uDomDepartment }
+      uDomDepartmentDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomRole -> { uDomTypes }
+      uDomRole -> { uKernelUtils uDomDepartment } [arrowhead=open,style=dashed]
+      uDomRoleDetail -> { uDomTypes uDomRole }
+      uDomRoleDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomPermission -> { uDomTypes }
+      uDomPermission -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomPermissionDetail -> { uDomTypes uDomPermission }
+      uDomPermissionDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomNotification -> { uDomTypes }
+      uDomNotification -> { uKernelUtils uDomReport } [arrowhead=open,style=dashed]
+      uDomNotificationDetail -> { uDomTypes uDomNotification }
+      uDomNotificationDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomReport -> { uDomTypes }
+      uDomReport -> { uKernelUtils uDomNotification } [arrowhead=open,style=dashed]
+      uDomReportDetail -> { uDomTypes uDomReport }
+      uDomReportDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomDashboard -> { uDomTypes }
+      uDomDashboard -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomDashboardDetail -> { uDomTypes uDomDashboard }
+      uDomDashboardDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomAudit -> { uDomTypes }
+      uDomAudit -> { uKernelUtils uDomSetting } [arrowhead=open,style=dashed]
+      uDomAuditDetail -> { uDomTypes uDomAudit }
+      uDomAuditDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomSetting -> { uDomTypes }
+      uDomSetting -> { uKernelUtils uDomAudit } [arrowhead=open,style=dashed]
+      uDomSettingDetail -> { uDomTypes uDomSetting }
+      uDomSettingDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomImport -> { uDomTypes }
+      uDomImport -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomImportDetail -> { uDomTypes uDomImport }
+      uDomImportDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomExport -> { uDomTypes }
+      uDomExport -> { uKernelUtils uDomBatch } [arrowhead=open,style=dashed]
+      uDomExportDetail -> { uDomTypes uDomExport }
+      uDomExportDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomBatch -> { uDomTypes }
+      uDomBatch -> { uKernelUtils uDomExport } [arrowhead=open,style=dashed]
+      uDomBatchDetail -> { uDomTypes uDomBatch }
+      uDomBatchDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomSchedule -> { uDomTypes }
+      uDomSchedule -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomScheduleDetail -> { uDomTypes uDomSchedule }
+      uDomScheduleDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomReminder -> { uDomTypes }
+      uDomReminder -> { uKernelUtils uDomDocument } [arrowhead=open,style=dashed]
+      uDomReminderDetail -> { uDomTypes uDomReminder }
+      uDomReminderDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDomDocument -> { uDomTypes }
+      uDomDocument -> { uKernelUtils uDomReminder } [arrowhead=open,style=dashed]
+      uDomDocumentDetail -> { uDomTypes uDomDocument }
+      uDomDocumentDetail -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDbConnection -> { uKernelConfig }
+      uDbConnection -> { uKernelLog uKernelExceptions } [arrowhead=open,style=dashed]
+      uDbRepository -> { uDbConnection uDomTypes }
+      uDbRepository -> { uKernelLog } [arrowhead=open,style=dashed]
+      uDbUserRepo -> { uDbRepository uDomUser }
+      uDbUserRepo -> { uKernelUtils } [arrowhead=open,style=dashed]
+      uDbCustomerRepo -> { uDbRepository uDomCustomer }
+      uDbCustomerRepo -> { uKernelUtils uDbOrderRepo } [arrowhead=open,style=dashed]
+      uDbOrderRepo -> { uDbRepository uDomOrder }
+      uDbOrderRepo -> { uKernelUtils uDbCustomerRepo } [arrowhead=open,style=dashed]
+      uDbProductRepo -> { uDbRepository uDomProduct }
+      uDbProductRepo -> { uKernelUtils uDbInvoiceRepo } [arrowhead=open,style=dashed]
+      uDbInvoiceRepo -> { uDbRepository uDomInvoice }
+      uDbInvoiceRepo -> { uKernelUtils uDbProductRepo } [arrowhead=open,style=dashed]
+      uDbShipmentRepo -> { uDbRepository uDomShipment }
+      uDbShipmentRepo -> { uKernelUtils uDbPaymentRepo } [arrowhead=open,style=dashed]
+      uDbPaymentRepo -> { uDbRepository uDomPayment }
+      uDbPaymentRepo -> { uKernelUtils uDbShipmentRepo } [arrowhead=open,style=dashed]
+      uDbSupplierRepo -> { uDbRepository uDomSupplier }
+      uDbSupplierRepo -> { uKernelUtils uDbWarehouseRepo } [arrowhead=open,style=dashed]
+      uDbWarehouseRepo -> { uDbRepository uDomWarehouse }
+      uDbWarehouseRepo -> { uKernelUtils uDbSupplierRepo } [arrowhead=open,style=dashed]
+      uDbCategoryRepo -> { uDbRepository uDomCategory }
+      uDbCategoryRepo -> { uKernelUtils uDbDiscountRepo } [arrowhead=open,style=dashed]
+      uDbDiscountRepo -> { uDbRepository uDomDiscount }
+      uDbDiscountRepo -> { uKernelUtils uDbCategoryRepo } [arrowhead=open,style=dashed]
+      uDbTaxRepo -> { uDbRepository uDomTax }
+      uDbTaxRepo -> { uKernelUtils uDbCurrencyRepo } [arrowhead=open,style=dashed]
+      uDbCurrencyRepo -> { uDbRepository uDomCurrency }
+      uDbCurrencyRepo -> { uKernelUtils uDbTaxRepo } [arrowhead=open,style=dashed]
+      uDbContractRepo -> { uDbRepository uDomContract }
+      uDbContractRepo -> { uKernelUtils uDbQuotationRepo } [arrowhead=open,style=dashed]
+      uDbQuotationRepo -> { uDbRepository uDomQuotation }
+      uDbQuotationRepo -> { uKernelUtils uDbContractRepo } [arrowhead=open,style=dashed]
+      uDbReturnRepo -> { uDbRepository uDomReturn }
+      uDbReturnRepo -> { uKernelUtils uDbRefundRepo } [arrowhead=open,style=dashed]
+      uDbRefundRepo -> { uDbRepository uDomRefund }
+      uDbRefundRepo -> { uKernelUtils uDbReturnRepo } [arrowhead=open,style=dashed]
+      uDbInventoryRepo -> { uDbRepository uDomInventory }
+      uDbInventoryRepo -> { uKernelUtils uDbStockRepo } [arrowhead=open,style=dashed]
+      uDbStockRepo -> { uDbRepository uDomStock }
+      uDbStockRepo -> { uKernelUtils uDbInventoryRepo } [arrowhead=open,style=dashed]
+      uDbPricingRepo -> { uDbRepository uDomPricing }
+      uDbPricingRepo -> { uKernelUtils uDbCampaignRepo } [arrowhead=open,style=dashed]
+      uDbCampaignRepo -> { uDbRepository uDomCampaign }
+      uDbCampaignRepo -> { uKernelUtils uDbPricingRepo } [arrowhead=open,style=dashed]
+      uDbLeadRepo -> { uDbRepository uDomLead }
+      uDbLeadRepo -> { uKernelUtils uDbOpportunityRepo } [arrowhead=open,style=dashed]
+      uDbOpportunityRepo -> { uDbRepository uDomOpportunity }
+      uDbOpportunityRepo -> { uKernelUtils uDbLeadRepo } [arrowhead=open,style=dashed]
+      uDbContactRepo -> { uDbRepository uDomContact }
+      uDbContactRepo -> { uKernelUtils uDbAccountRepo } [arrowhead=open,style=dashed]
+      uDbAccountRepo -> { uDbRepository uDomAccount }
+      uDbAccountRepo -> { uKernelUtils uDbContactRepo } [arrowhead=open,style=dashed]
+      uDbTicketRepo -> { uDbRepository uDomTicket }
+      uDbTicketRepo -> { uKernelUtils uDbProjectRepo } [arrowhead=open,style=dashed]
+      uDbProjectRepo -> { uDbRepository uDomProject }
+      uDbProjectRepo -> { uKernelUtils uDbTicketRepo } [arrowhead=open,style=dashed]
+      uDbTaskRepo -> { uDbRepository uDomTask }
+      uDbTaskRepo -> { uKernelUtils uDbTimesheetRepo } [arrowhead=open,style=dashed]
+      uDbTimesheetRepo -> { uDbRepository uDomTimesheet }
+      uDbTimesheetRepo -> { uKernelUtils uDbTaskRepo } [arrowhead=open,style=dashed]
+      uDbExpenseRepo -> { uDbRepository uDomExpense }
+      uDbExpenseRepo -> { uKernelUtils uDbBudgetRepo } [arrowhead=open,style=dashed]
+      uDbBudgetRepo -> { uDbRepository uDomBudget }
+      uDbBudgetRepo -> { uKernelUtils uDbExpenseRepo } [arrowhead=open,style=dashed]
+      uDbLedgerRepo -> { uDbRepository uDomLedger }
+      uDbLedgerRepo -> { uKernelUtils uDbJournalRepo } [arrowhead=open,style=dashed]
+      uDbJournalRepo -> { uDbRepository uDomJournal }
+      uDbJournalRepo -> { uKernelUtils uDbLedgerRepo } [arrowhead=open,style=dashed]
+      uDbAssetRepo -> { uDbRepository uDomAsset }
+      uDbAssetRepo -> { uKernelUtils uDbDepreciationRepo } [arrowhead=open,style=dashed]
+      uDbDepreciationRepo -> { uDbRepository uDomDepreciation }
+      uDbDepreciationRepo -> { uKernelUtils uDbAssetRepo } [arrowhead=open,style=dashed]
+      uDbPayrollRepo -> { uDbRepository uDomPayroll }
+      uDbPayrollRepo -> { uKernelUtils uDbEmployeeRepo } [arrowhead=open,style=dashed]
+      uDbEmployeeRepo -> { uDbRepository uDomEmployee }
+      uDbEmployeeRepo -> { uKernelUtils uDbPayrollRepo } [arrowhead=open,style=dashed]
+      uDbDepartmentRepo -> { uDbRepository uDomDepartment }
+      uDbDepartmentRepo -> { uKernelUtils uDbRoleRepo } [arrowhead=open,style=dashed]
+      uDbRoleRepo -> { uDbRepository uDomRole }
+      uDbRoleRepo -> { uKernelUtils uDbDepartmentRepo } [arrowhead=open,style=dashed]
+      uDbPermissionRepo -> { uDbRepository uDomPermission }
+      uDbPermissionRepo -> { uKernelUtils uDbNotificationRepo } [arrowhead=open,style=dashed]
+      uDbNotificationRepo -> { uDbRepository uDomNotification }
+      uDbNotificationRepo -> { uKernelUtils uDbPermissionRepo } [arrowhead=open,style=dashed]
+      uDbReportRepo -> { uDbRepository uDomReport }
+      uDbReportRepo -> { uKernelUtils uDbDashboardRepo } [arrowhead=open,style=dashed]
+      uDbDashboardRepo -> { uDbRepository uDomDashboard }
+      uDbDashboardRepo -> { uKernelUtils uDbReportRepo } [arrowhead=open,style=dashed]
+      uDbAuditRepo -> { uDbRepository uDomAudit }
+      uDbAuditRepo -> { uKernelUtils uDbSettingRepo } [arrowhead=open,style=dashed]
+      uDbSettingRepo -> { uDbRepository uDomSetting }
+      uDbSettingRepo -> { uKernelUtils uDbAuditRepo } [arrowhead=open,style=dashed]
+      uDbImportRepo -> { uDbRepository uDomImport }
+      uDbImportRepo -> { uKernelUtils uDbExportRepo } [arrowhead=open,style=dashed]
+      uDbExportRepo -> { uDbRepository uDomExport }
+      uDbExportRepo -> { uKernelUtils uDbImportRepo } [arrowhead=open,style=dashed]
+      uDbBatchRepo -> { uDbRepository uDomBatch }
+      uDbBatchRepo -> { uKernelUtils uDbScheduleRepo } [arrowhead=open,style=dashed]
+      uDbScheduleRepo -> { uDbRepository uDomSchedule }
+      uDbScheduleRepo -> { uKernelUtils uDbBatchRepo } [arrowhead=open,style=dashed]
+      uDbReminderRepo -> { uDbRepository uDomReminder }
+      uDbReminderRepo -> { uKernelUtils uDbDocumentRepo } [arrowhead=open,style=dashed]
+      uDbDocumentRepo -> { uDbRepository uDomDocument }
+      uDbDocumentRepo -> { uKernelUtils uDbReminderRepo } [arrowhead=open,style=dashed]
+      uSvcAuth -> { uDomUser }
+      uSvcAuth -> { uDbUserRepo uKernelLog uKernelConfig } [arrowhead=open,style=dashed]
+      uSvcNotification -> { uDomNotification uDomNotificationDetail }
+      uSvcNotification -> { uDbNotificationRepo uKernelLog uKernelEvents uSvcPermission } [arrowhead=open,style=dashed]
+      uSvcReport -> { uDomReport uDomReportDetail }
+      uSvcReport -> { uDbReportRepo uKernelLog uKernelEvents uSvcDashboard } [arrowhead=open,style=dashed]
+      uSvcCustomer -> { uDomCustomer uDomCustomerDetail }
+      uSvcCustomer -> { uDbCustomerRepo uKernelLog uKernelEvents uSvcOrder } [arrowhead=open,style=dashed]
+      uSvcOrder -> { uDomOrder uDomOrderDetail }
+      uSvcOrder -> { uDbOrderRepo uKernelLog uKernelEvents uSvcCustomer } [arrowhead=open,style=dashed]
+      uSvcProduct -> { uDomProduct uDomProductDetail }
+      uSvcProduct -> { uDbProductRepo uKernelLog uKernelEvents uSvcInvoice } [arrowhead=open,style=dashed]
+      uSvcInvoice -> { uDomInvoice uDomInvoiceDetail }
+      uSvcInvoice -> { uDbInvoiceRepo uKernelLog uKernelEvents uSvcProduct } [arrowhead=open,style=dashed]
+      uSvcShipment -> { uDomShipment uDomShipmentDetail }
+      uSvcShipment -> { uDbShipmentRepo uKernelLog uKernelEvents uSvcPayment } [arrowhead=open,style=dashed]
+      uSvcPayment -> { uDomPayment uDomPaymentDetail }
+      uSvcPayment -> { uDbPaymentRepo uKernelLog uKernelEvents uSvcShipment } [arrowhead=open,style=dashed]
+      uSvcSupplier -> { uDomSupplier uDomSupplierDetail }
+      uSvcSupplier -> { uDbSupplierRepo uKernelLog uKernelEvents uSvcWarehouse } [arrowhead=open,style=dashed]
+      uSvcWarehouse -> { uDomWarehouse uDomWarehouseDetail }
+      uSvcWarehouse -> { uDbWarehouseRepo uKernelLog uKernelEvents uSvcSupplier } [arrowhead=open,style=dashed]
+      uSvcCategory -> { uDomCategory uDomCategoryDetail }
+      uSvcCategory -> { uDbCategoryRepo uKernelLog uKernelEvents uSvcDiscount } [arrowhead=open,style=dashed]
+      uSvcDiscount -> { uDomDiscount uDomDiscountDetail }
+      uSvcDiscount -> { uDbDiscountRepo uKernelLog uKernelEvents uSvcCategory } [arrowhead=open,style=dashed]
+      uSvcTax -> { uDomTax uDomTaxDetail }
+      uSvcTax -> { uDbTaxRepo uKernelLog uKernelEvents uSvcCurrency } [arrowhead=open,style=dashed]
+      uSvcCurrency -> { uDomCurrency uDomCurrencyDetail }
+      uSvcCurrency -> { uDbCurrencyRepo uKernelLog uKernelEvents uSvcTax } [arrowhead=open,style=dashed]
+      uSvcContract -> { uDomContract uDomContractDetail }
+      uSvcContract -> { uDbContractRepo uKernelLog uKernelEvents uSvcQuotation } [arrowhead=open,style=dashed]
+      uSvcQuotation -> { uDomQuotation uDomQuotationDetail }
+      uSvcQuotation -> { uDbQuotationRepo uKernelLog uKernelEvents uSvcContract } [arrowhead=open,style=dashed]
+      uSvcReturn -> { uDomReturn uDomReturnDetail }
+      uSvcReturn -> { uDbReturnRepo uKernelLog uKernelEvents uSvcRefund } [arrowhead=open,style=dashed]
+      uSvcRefund -> { uDomRefund uDomRefundDetail }
+      uSvcRefund -> { uDbRefundRepo uKernelLog uKernelEvents uSvcReturn } [arrowhead=open,style=dashed]
+      uSvcInventory -> { uDomInventory uDomInventoryDetail }
+      uSvcInventory -> { uDbInventoryRepo uKernelLog uKernelEvents uSvcStock } [arrowhead=open,style=dashed]
+      uSvcStock -> { uDomStock uDomStockDetail }
+      uSvcStock -> { uDbStockRepo uKernelLog uKernelEvents uSvcInventory } [arrowhead=open,style=dashed]
+      uSvcPricing -> { uDomPricing uDomPricingDetail }
+      uSvcPricing -> { uDbPricingRepo uKernelLog uKernelEvents uSvcCampaign } [arrowhead=open,style=dashed]
+      uSvcCampaign -> { uDomCampaign uDomCampaignDetail }
+      uSvcCampaign -> { uDbCampaignRepo uKernelLog uKernelEvents uSvcPricing } [arrowhead=open,style=dashed]
+      uSvcLead -> { uDomLead uDomLeadDetail }
+      uSvcLead -> { uDbLeadRepo uKernelLog uKernelEvents uSvcOpportunity } [arrowhead=open,style=dashed]
+      uSvcOpportunity -> { uDomOpportunity uDomOpportunityDetail }
+      uSvcOpportunity -> { uDbOpportunityRepo uKernelLog uKernelEvents uSvcLead } [arrowhead=open,style=dashed]
+      uSvcContact -> { uDomContact uDomContactDetail }
+      uSvcContact -> { uDbContactRepo uKernelLog uKernelEvents uSvcAccount } [arrowhead=open,style=dashed]
+      uSvcAccount -> { uDomAccount uDomAccountDetail }
+      uSvcAccount -> { uDbAccountRepo uKernelLog uKernelEvents uSvcContact } [arrowhead=open,style=dashed]
+      uSvcTicket -> { uDomTicket uDomTicketDetail }
+      uSvcTicket -> { uDbTicketRepo uKernelLog uKernelEvents uSvcProject } [arrowhead=open,style=dashed]
+      uSvcProject -> { uDomProject uDomProjectDetail }
+      uSvcProject -> { uDbProjectRepo uKernelLog uKernelEvents uSvcTicket } [arrowhead=open,style=dashed]
+      uSvcTask -> { uDomTask uDomTaskDetail }
+      uSvcTask -> { uDbTaskRepo uKernelLog uKernelEvents uSvcTimesheet } [arrowhead=open,style=dashed]
+      uSvcTimesheet -> { uDomTimesheet uDomTimesheetDetail }
+      uSvcTimesheet -> { uDbTimesheetRepo uKernelLog uKernelEvents uSvcTask } [arrowhead=open,style=dashed]
+      uSvcExpense -> { uDomExpense uDomExpenseDetail }
+      uSvcExpense -> { uDbExpenseRepo uKernelLog uKernelEvents uSvcBudget } [arrowhead=open,style=dashed]
+      uSvcBudget -> { uDomBudget uDomBudgetDetail }
+      uSvcBudget -> { uDbBudgetRepo uKernelLog uKernelEvents uSvcExpense } [arrowhead=open,style=dashed]
+      uSvcLedger -> { uDomLedger uDomLedgerDetail }
+      uSvcLedger -> { uDbLedgerRepo uKernelLog uKernelEvents uSvcJournal } [arrowhead=open,style=dashed]
+      uSvcJournal -> { uDomJournal uDomJournalDetail }
+      uSvcJournal -> { uDbJournalRepo uKernelLog uKernelEvents uSvcLedger } [arrowhead=open,style=dashed]
+      uSvcAsset -> { uDomAsset uDomAssetDetail }
+      uSvcAsset -> { uDbAssetRepo uKernelLog uKernelEvents uSvcDepreciation } [arrowhead=open,style=dashed]
+      uSvcDepreciation -> { uDomDepreciation uDomDepreciationDetail }
+      uSvcDepreciation -> { uDbDepreciationRepo uKernelLog uKernelEvents uSvcAsset } [arrowhead=open,style=dashed]
+      uSvcPayroll -> { uDomPayroll uDomPayrollDetail }
+      uSvcPayroll -> { uDbPayrollRepo uKernelLog uKernelEvents uSvcEmployee } [arrowhead=open,style=dashed]
+      uSvcEmployee -> { uDomEmployee uDomEmployeeDetail }
+      uSvcEmployee -> { uDbEmployeeRepo uKernelLog uKernelEvents uSvcPayroll } [arrowhead=open,style=dashed]
+      uSvcDepartment -> { uDomDepartment uDomDepartmentDetail }
+      uSvcDepartment -> { uDbDepartmentRepo uKernelLog uKernelEvents uSvcRole } [arrowhead=open,style=dashed]
+      uSvcRole -> { uDomRole uDomRoleDetail }
+      uSvcRole -> { uDbRoleRepo uKernelLog uKernelEvents uSvcDepartment } [arrowhead=open,style=dashed]
+      uSvcPermission -> { uDomPermission uDomPermissionDetail }
+      uSvcPermission -> { uDbPermissionRepo uKernelLog uKernelEvents uSvcNotification } [arrowhead=open,style=dashed]
+      uSvcDashboard -> { uDomDashboard uDomDashboardDetail }
+      uSvcDashboard -> { uDbDashboardRepo uKernelLog uKernelEvents uSvcReport } [arrowhead=open,style=dashed]
+      uSvcAudit -> { uDomAudit uDomAuditDetail }
+      uSvcAudit -> { uDbAuditRepo uKernelLog uKernelEvents uSvcSetting } [arrowhead=open,style=dashed]
+      uSvcSetting -> { uDomSetting uDomSettingDetail }
+      uSvcSetting -> { uDbSettingRepo uKernelLog uKernelEvents uSvcAudit } [arrowhead=open,style=dashed]
+      uSvcImport -> { uDomImport uDomImportDetail }
+      uSvcImport -> { uDbImportRepo uKernelLog uKernelEvents uSvcExport } [arrowhead=open,style=dashed]
+      uSvcExport -> { uDomExport uDomExportDetail }
+      uSvcExport -> { uDbExportRepo uKernelLog uKernelEvents uSvcImport } [arrowhead=open,style=dashed]
+      uSvcBatch -> { uDomBatch uDomBatchDetail }
+      uSvcBatch -> { uDbBatchRepo uKernelLog uKernelEvents uSvcSchedule } [arrowhead=open,style=dashed]
+      uSvcSchedule -> { uDomSchedule uDomScheduleDetail }
+      uSvcSchedule -> { uDbScheduleRepo uKernelLog uKernelEvents uSvcBatch } [arrowhead=open,style=dashed]
+      uSvcReminder -> { uDomReminder uDomReminderDetail }
+      uSvcReminder -> { uDbReminderRepo uKernelLog uKernelEvents uSvcDocument } [arrowhead=open,style=dashed]
+      uSvcDocument -> { uDomDocument uDomDocumentDetail }
+      uSvcDocument -> { uDbDocumentRepo uKernelLog uKernelEvents uSvcReminder } [arrowhead=open,style=dashed]
+      dmMain -> { uDbConnection }
+      dmMain -> { uSvcAuth uKernelLog uKernelConfig uKernelContainer } [arrowhead=open,style=dashed]
+      dmCustomer -> { uDbConnection }
+      dmCustomer -> { uSvcCustomer uDbCustomerRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmOrder -> { uDbConnection }
+      dmOrder -> { uSvcOrder uDbOrderRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmProduct -> { uDbConnection }
+      dmProduct -> { uSvcProduct uDbProductRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmInvoice -> { uDbConnection }
+      dmInvoice -> { uSvcInvoice uDbInvoiceRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmShipment -> { uDbConnection }
+      dmShipment -> { uSvcShipment uDbShipmentRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmPayment -> { uDbConnection }
+      dmPayment -> { uSvcPayment uDbPaymentRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmSupplier -> { uDbConnection }
+      dmSupplier -> { uSvcSupplier uDbSupplierRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmWarehouse -> { uDbConnection }
+      dmWarehouse -> { uSvcWarehouse uDbWarehouseRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmCategory -> { uDbConnection }
+      dmCategory -> { uSvcCategory uDbCategoryRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmDiscount -> { uDbConnection }
+      dmDiscount -> { uSvcDiscount uDbDiscountRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmTax -> { uDbConnection }
+      dmTax -> { uSvcTax uDbTaxRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmCurrency -> { uDbConnection }
+      dmCurrency -> { uSvcCurrency uDbCurrencyRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmContract -> { uDbConnection }
+      dmContract -> { uSvcContract uDbContractRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmQuotation -> { uDbConnection }
+      dmQuotation -> { uSvcQuotation uDbQuotationRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmReturn -> { uDbConnection }
+      dmReturn -> { uSvcReturn uDbReturnRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmRefund -> { uDbConnection }
+      dmRefund -> { uSvcRefund uDbRefundRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmInventory -> { uDbConnection }
+      dmInventory -> { uSvcInventory uDbInventoryRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmStock -> { uDbConnection }
+      dmStock -> { uSvcStock uDbStockRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmPricing -> { uDbConnection }
+      dmPricing -> { uSvcPricing uDbPricingRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmCampaign -> { uDbConnection }
+      dmCampaign -> { uSvcCampaign uDbCampaignRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmLead -> { uDbConnection }
+      dmLead -> { uSvcLead uDbLeadRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmOpportunity -> { uDbConnection }
+      dmOpportunity -> { uSvcOpportunity uDbOpportunityRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmContact -> { uDbConnection }
+      dmContact -> { uSvcContact uDbContactRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmAccount -> { uDbConnection }
+      dmAccount -> { uSvcAccount uDbAccountRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmTicket -> { uDbConnection }
+      dmTicket -> { uSvcTicket uDbTicketRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmProject -> { uDbConnection }
+      dmProject -> { uSvcProject uDbProjectRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmTask -> { uDbConnection }
+      dmTask -> { uSvcTask uDbTaskRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmTimesheet -> { uDbConnection }
+      dmTimesheet -> { uSvcTimesheet uDbTimesheetRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmExpense -> { uDbConnection }
+      dmExpense -> { uSvcExpense uDbExpenseRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmBudget -> { uDbConnection }
+      dmBudget -> { uSvcBudget uDbBudgetRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmLedger -> { uDbConnection }
+      dmLedger -> { uSvcLedger uDbLedgerRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmJournal -> { uDbConnection }
+      dmJournal -> { uSvcJournal uDbJournalRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmAsset -> { uDbConnection }
+      dmAsset -> { uSvcAsset uDbAssetRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmDepreciation -> { uDbConnection }
+      dmDepreciation -> { uSvcDepreciation uDbDepreciationRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmPayroll -> { uDbConnection }
+      dmPayroll -> { uSvcPayroll uDbPayrollRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmEmployee -> { uDbConnection }
+      dmEmployee -> { uSvcEmployee uDbEmployeeRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmDepartment -> { uDbConnection }
+      dmDepartment -> { uSvcDepartment uDbDepartmentRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmRole -> { uDbConnection }
+      dmRole -> { uSvcRole uDbRoleRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmPermission -> { uDbConnection }
+      dmPermission -> { uSvcPermission uDbPermissionRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmNotification -> { uDbConnection }
+      dmNotification -> { uSvcNotification uDbNotificationRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmReport -> { uDbConnection }
+      dmReport -> { uSvcReport uDbReportRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmDashboard -> { uDbConnection }
+      dmDashboard -> { uSvcDashboard uDbDashboardRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmAudit -> { uDbConnection }
+      dmAudit -> { uSvcAudit uDbAuditRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmSetting -> { uDbConnection }
+      dmSetting -> { uSvcSetting uDbSettingRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmImport -> { uDbConnection }
+      dmImport -> { uSvcImport uDbImportRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmExport -> { uDbConnection }
+      dmExport -> { uSvcExport uDbExportRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmBatch -> { uDbConnection }
+      dmBatch -> { uSvcBatch uDbBatchRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmSchedule -> { uDbConnection }
+      dmSchedule -> { uSvcSchedule uDbScheduleRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmReminder -> { uDbConnection }
+      dmReminder -> { uSvcReminder uDbReminderRepo uKernelLog } [arrowhead=open,style=dashed]
+      dmDocument -> { uDbConnection }
+      dmDocument -> { uSvcDocument uDbDocumentRepo uKernelLog } [arrowhead=open,style=dashed]
+      frmAuditLog -> { uDomTypes }
+      frmAuditLog -> { uKernelLog uKernelEvents } [arrowhead=open,style=dashed]
+      frmAddress -> { uDomAddress }
+      frmAddress -> { uKernelUtils } [arrowhead=open,style=dashed]
+      frmCustomerList -> { uDomCustomer }
+      frmCustomerList -> { dmCustomer uSvcCustomer uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmCustomerEdit -> { uDomCustomerDetail }
+      frmCustomerEdit -> { dmCustomer uKernelUtils } [arrowhead=open,style=dashed]
+      frmOrderList -> { uDomOrder }
+      frmOrderList -> { dmOrder uSvcOrder uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmOrderEdit -> { uDomOrderDetail }
+      frmOrderEdit -> { dmOrder uKernelUtils } [arrowhead=open,style=dashed]
+      frmProductList -> { uDomProduct }
+      frmProductList -> { dmProduct uSvcProduct uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmProductEdit -> { uDomProductDetail }
+      frmProductEdit -> { dmProduct uKernelUtils } [arrowhead=open,style=dashed]
+      frmInvoiceList -> { uDomInvoice }
+      frmInvoiceList -> { dmInvoice uSvcInvoice uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmInvoiceEdit -> { uDomInvoiceDetail }
+      frmInvoiceEdit -> { dmInvoice uKernelUtils } [arrowhead=open,style=dashed]
+      frmShipmentList -> { uDomShipment }
+      frmShipmentList -> { dmShipment uSvcShipment uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmShipmentEdit -> { uDomShipmentDetail }
+      frmShipmentEdit -> { dmShipment uKernelUtils } [arrowhead=open,style=dashed]
+      frmPaymentList -> { uDomPayment }
+      frmPaymentList -> { dmPayment uSvcPayment uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmPaymentEdit -> { uDomPaymentDetail }
+      frmPaymentEdit -> { dmPayment uKernelUtils } [arrowhead=open,style=dashed]
+      frmSupplierList -> { uDomSupplier }
+      frmSupplierList -> { dmSupplier uSvcSupplier uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmSupplierEdit -> { uDomSupplierDetail }
+      frmSupplierEdit -> { dmSupplier uKernelUtils } [arrowhead=open,style=dashed]
+      frmWarehouseList -> { uDomWarehouse }
+      frmWarehouseList -> { dmWarehouse uSvcWarehouse uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmWarehouseEdit -> { uDomWarehouseDetail }
+      frmWarehouseEdit -> { dmWarehouse uKernelUtils } [arrowhead=open,style=dashed]
+      frmCategoryList -> { uDomCategory }
+      frmCategoryList -> { dmCategory uSvcCategory uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmCategoryEdit -> { uDomCategoryDetail }
+      frmCategoryEdit -> { dmCategory uKernelUtils } [arrowhead=open,style=dashed]
+      frmDiscountList -> { uDomDiscount }
+      frmDiscountList -> { dmDiscount uSvcDiscount uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmDiscountEdit -> { uDomDiscountDetail }
+      frmDiscountEdit -> { dmDiscount uKernelUtils } [arrowhead=open,style=dashed]
+      frmTaxList -> { uDomTax }
+      frmTaxList -> { dmTax uSvcTax uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmTaxEdit -> { uDomTaxDetail }
+      frmTaxEdit -> { dmTax uKernelUtils } [arrowhead=open,style=dashed]
+      frmCurrencyList -> { uDomCurrency }
+      frmCurrencyList -> { dmCurrency uSvcCurrency uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmCurrencyEdit -> { uDomCurrencyDetail }
+      frmCurrencyEdit -> { dmCurrency uKernelUtils } [arrowhead=open,style=dashed]
+      frmContractList -> { uDomContract }
+      frmContractList -> { dmContract uSvcContract uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmContractEdit -> { uDomContractDetail }
+      frmContractEdit -> { dmContract uKernelUtils } [arrowhead=open,style=dashed]
+      frmQuotationList -> { uDomQuotation }
+      frmQuotationList -> { dmQuotation uSvcQuotation uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmQuotationEdit -> { uDomQuotationDetail }
+      frmQuotationEdit -> { dmQuotation uKernelUtils } [arrowhead=open,style=dashed]
+      frmReturnList -> { uDomReturn }
+      frmReturnList -> { dmReturn uSvcReturn uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmReturnEdit -> { uDomReturnDetail }
+      frmReturnEdit -> { dmReturn uKernelUtils } [arrowhead=open,style=dashed]
+      frmRefundList -> { uDomRefund }
+      frmRefundList -> { dmRefund uSvcRefund uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmRefundEdit -> { uDomRefundDetail }
+      frmRefundEdit -> { dmRefund uKernelUtils } [arrowhead=open,style=dashed]
+      frmInventoryList -> { uDomInventory }
+      frmInventoryList -> { dmInventory uSvcInventory uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmInventoryEdit -> { uDomInventoryDetail }
+      frmInventoryEdit -> { dmInventory uKernelUtils } [arrowhead=open,style=dashed]
+      frmStockList -> { uDomStock }
+      frmStockList -> { dmStock uSvcStock uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmStockEdit -> { uDomStockDetail }
+      frmStockEdit -> { dmStock uKernelUtils } [arrowhead=open,style=dashed]
+      frmPricingList -> { uDomPricing }
+      frmPricingList -> { dmPricing uSvcPricing uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmPricingEdit -> { uDomPricingDetail }
+      frmPricingEdit -> { dmPricing uKernelUtils } [arrowhead=open,style=dashed]
+      frmCampaignList -> { uDomCampaign }
+      frmCampaignList -> { dmCampaign uSvcCampaign uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmCampaignEdit -> { uDomCampaignDetail }
+      frmCampaignEdit -> { dmCampaign uKernelUtils } [arrowhead=open,style=dashed]
+      frmLeadList -> { uDomLead }
+      frmLeadList -> { dmLead uSvcLead uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmLeadEdit -> { uDomLeadDetail }
+      frmLeadEdit -> { dmLead uKernelUtils } [arrowhead=open,style=dashed]
+      frmOpportunityList -> { uDomOpportunity }
+      frmOpportunityList -> { dmOpportunity uSvcOpportunity uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmOpportunityEdit -> { uDomOpportunityDetail }
+      frmOpportunityEdit -> { dmOpportunity uKernelUtils } [arrowhead=open,style=dashed]
+      frmContactList -> { uDomContact }
+      frmContactList -> { dmContact uSvcContact uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmContactEdit -> { uDomContactDetail }
+      frmContactEdit -> { dmContact uKernelUtils } [arrowhead=open,style=dashed]
+      frmAccountList -> { uDomAccount }
+      frmAccountList -> { dmAccount uSvcAccount uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmAccountEdit -> { uDomAccountDetail }
+      frmAccountEdit -> { dmAccount uKernelUtils } [arrowhead=open,style=dashed]
+      frmTicketList -> { uDomTicket }
+      frmTicketList -> { dmTicket uSvcTicket uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmTicketEdit -> { uDomTicketDetail }
+      frmTicketEdit -> { dmTicket uKernelUtils } [arrowhead=open,style=dashed]
+      frmProjectList -> { uDomProject }
+      frmProjectList -> { dmProject uSvcProject uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmProjectEdit -> { uDomProjectDetail }
+      frmProjectEdit -> { dmProject uKernelUtils } [arrowhead=open,style=dashed]
+      frmTaskList -> { uDomTask }
+      frmTaskList -> { dmTask uSvcTask uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmTaskEdit -> { uDomTaskDetail }
+      frmTaskEdit -> { dmTask uKernelUtils } [arrowhead=open,style=dashed]
+      frmTimesheetList -> { uDomTimesheet }
+      frmTimesheetList -> { dmTimesheet uSvcTimesheet uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmTimesheetEdit -> { uDomTimesheetDetail }
+      frmTimesheetEdit -> { dmTimesheet uKernelUtils } [arrowhead=open,style=dashed]
+      frmExpenseList -> { uDomExpense }
+      frmExpenseList -> { dmExpense uSvcExpense uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmExpenseEdit -> { uDomExpenseDetail }
+      frmExpenseEdit -> { dmExpense uKernelUtils } [arrowhead=open,style=dashed]
+      frmBudgetList -> { uDomBudget }
+      frmBudgetList -> { dmBudget uSvcBudget uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmBudgetEdit -> { uDomBudgetDetail }
+      frmBudgetEdit -> { dmBudget uKernelUtils } [arrowhead=open,style=dashed]
+      frmLedgerList -> { uDomLedger }
+      frmLedgerList -> { dmLedger uSvcLedger uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmLedgerEdit -> { uDomLedgerDetail }
+      frmLedgerEdit -> { dmLedger uKernelUtils } [arrowhead=open,style=dashed]
+      frmJournalList -> { uDomJournal }
+      frmJournalList -> { dmJournal uSvcJournal uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmJournalEdit -> { uDomJournalDetail }
+      frmJournalEdit -> { dmJournal uKernelUtils } [arrowhead=open,style=dashed]
+      frmAssetList -> { uDomAsset }
+      frmAssetList -> { dmAsset uSvcAsset uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmAssetEdit -> { uDomAssetDetail }
+      frmAssetEdit -> { dmAsset uKernelUtils } [arrowhead=open,style=dashed]
+      frmDepreciationList -> { uDomDepreciation }
+      frmDepreciationList -> { dmDepreciation uSvcDepreciation uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmDepreciationEdit -> { uDomDepreciationDetail }
+      frmDepreciationEdit -> { dmDepreciation uKernelUtils } [arrowhead=open,style=dashed]
+      frmPayrollList -> { uDomPayroll }
+      frmPayrollList -> { dmPayroll uSvcPayroll uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmPayrollEdit -> { uDomPayrollDetail }
+      frmPayrollEdit -> { dmPayroll uKernelUtils } [arrowhead=open,style=dashed]
+      frmEmployeeList -> { uDomEmployee }
+      frmEmployeeList -> { dmEmployee uSvcEmployee uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmEmployeeEdit -> { uDomEmployeeDetail }
+      frmEmployeeEdit -> { dmEmployee uKernelUtils } [arrowhead=open,style=dashed]
+      frmDepartmentList -> { uDomDepartment }
+      frmDepartmentList -> { dmDepartment uSvcDepartment uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmDepartmentEdit -> { uDomDepartmentDetail }
+      frmDepartmentEdit -> { dmDepartment uKernelUtils } [arrowhead=open,style=dashed]
+      frmRoleList -> { uDomRole }
+      frmRoleList -> { dmRole uSvcRole uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmRoleEdit -> { uDomRoleDetail }
+      frmRoleEdit -> { dmRole uKernelUtils } [arrowhead=open,style=dashed]
+      frmPermissionList -> { uDomPermission }
+      frmPermissionList -> { dmPermission uSvcPermission uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmPermissionEdit -> { uDomPermissionDetail }
+      frmPermissionEdit -> { dmPermission uKernelUtils } [arrowhead=open,style=dashed]
+      frmNotificationList -> { uDomNotification }
+      frmNotificationList -> { dmNotification uSvcNotification uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmNotificationEdit -> { uDomNotificationDetail }
+      frmNotificationEdit -> { dmNotification uKernelUtils } [arrowhead=open,style=dashed]
+      frmReportList -> { uDomReport }
+      frmReportList -> { dmReport uSvcReport uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmReportEdit -> { uDomReportDetail }
+      frmReportEdit -> { dmReport uKernelUtils } [arrowhead=open,style=dashed]
+      frmDashboardList -> { uDomDashboard }
+      frmDashboardList -> { dmDashboard uSvcDashboard uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmDashboardEdit -> { uDomDashboardDetail }
+      frmDashboardEdit -> { dmDashboard uKernelUtils } [arrowhead=open,style=dashed]
+      frmAuditList -> { uDomAudit }
+      frmAuditList -> { dmAudit uSvcAudit uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmAuditEdit -> { uDomAuditDetail }
+      frmAuditEdit -> { dmAudit uKernelUtils } [arrowhead=open,style=dashed]
+      frmSettingList -> { uDomSetting }
+      frmSettingList -> { dmSetting uSvcSetting uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmSettingEdit -> { uDomSettingDetail }
+      frmSettingEdit -> { dmSetting uKernelUtils } [arrowhead=open,style=dashed]
+      frmImportList -> { uDomImport }
+      frmImportList -> { dmImport uSvcImport uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmImportEdit -> { uDomImportDetail }
+      frmImportEdit -> { dmImport uKernelUtils } [arrowhead=open,style=dashed]
+      frmExportList -> { uDomExport }
+      frmExportList -> { dmExport uSvcExport uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmExportEdit -> { uDomExportDetail }
+      frmExportEdit -> { dmExport uKernelUtils } [arrowhead=open,style=dashed]
+      frmBatchList -> { uDomBatch }
+      frmBatchList -> { dmBatch uSvcBatch uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmBatchEdit -> { uDomBatchDetail }
+      frmBatchEdit -> { dmBatch uKernelUtils } [arrowhead=open,style=dashed]
+      frmScheduleList -> { uDomSchedule }
+      frmScheduleList -> { dmSchedule uSvcSchedule uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmScheduleEdit -> { uDomScheduleDetail }
+      frmScheduleEdit -> { dmSchedule uKernelUtils } [arrowhead=open,style=dashed]
+      frmReminderList -> { uDomReminder }
+      frmReminderList -> { dmReminder uSvcReminder uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmReminderEdit -> { uDomReminderDetail }
+      frmReminderEdit -> { dmReminder uKernelUtils } [arrowhead=open,style=dashed]
+      frmDocumentList -> { uDomDocument }
+      frmDocumentList -> { dmDocument uSvcDocument uKernelUtils uKernelEvents } [arrowhead=open,style=dashed]
+      frmDocumentEdit -> { uDomDocumentDetail }
+      frmDocumentEdit -> { dmDocument uKernelUtils } [arrowhead=open,style=dashed]
+      fCustomer -> { frmCustomerList }
+      fCustomer -> { fCustomerEdit fCustomerReport dmCustomer uSvcCustomer uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fCustomerEdit -> { uDomCustomerDetail frmCustomerEdit }
+      fCustomerEdit -> { uSvcCustomer dmCustomer uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fCustomerReport -> { uDomTypes }
+      fCustomerReport -> { dmCustomer uSvcCustomer uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fOrder -> { frmOrderList }
+      fOrder -> { fOrderEdit fOrderReport dmOrder uSvcOrder uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fOrderEdit -> { uDomOrderDetail frmOrderEdit }
+      fOrderEdit -> { uSvcOrder dmOrder uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fOrderReport -> { uDomTypes }
+      fOrderReport -> { dmOrder uSvcOrder uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fProduct -> { frmProductList }
+      fProduct -> { fProductEdit fProductReport dmProduct uSvcProduct uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fProductEdit -> { uDomProductDetail frmProductEdit }
+      fProductEdit -> { uSvcProduct dmProduct uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fProductReport -> { uDomTypes }
+      fProductReport -> { dmProduct uSvcProduct uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fInvoice -> { frmInvoiceList }
+      fInvoice -> { fInvoiceEdit fInvoiceReport dmInvoice uSvcInvoice uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fInvoiceEdit -> { uDomInvoiceDetail frmInvoiceEdit }
+      fInvoiceEdit -> { uSvcInvoice dmInvoice uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fInvoiceReport -> { uDomTypes }
+      fInvoiceReport -> { dmInvoice uSvcInvoice uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fShipment -> { frmShipmentList }
+      fShipment -> { fShipmentEdit fShipmentReport dmShipment uSvcShipment uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fShipmentEdit -> { uDomShipmentDetail frmShipmentEdit }
+      fShipmentEdit -> { uSvcShipment dmShipment uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fShipmentReport -> { uDomTypes }
+      fShipmentReport -> { dmShipment uSvcShipment uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fPayment -> { frmPaymentList }
+      fPayment -> { fPaymentEdit fPaymentReport dmPayment uSvcPayment uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fPaymentEdit -> { uDomPaymentDetail frmPaymentEdit }
+      fPaymentEdit -> { uSvcPayment dmPayment uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fPaymentReport -> { uDomTypes }
+      fPaymentReport -> { dmPayment uSvcPayment uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fSupplier -> { frmSupplierList }
+      fSupplier -> { fSupplierEdit fSupplierReport dmSupplier uSvcSupplier uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fSupplierEdit -> { uDomSupplierDetail frmSupplierEdit }
+      fSupplierEdit -> { uSvcSupplier dmSupplier uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fSupplierReport -> { uDomTypes }
+      fSupplierReport -> { dmSupplier uSvcSupplier uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fWarehouse -> { frmWarehouseList }
+      fWarehouse -> { fWarehouseEdit fWarehouseReport dmWarehouse uSvcWarehouse uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fWarehouseEdit -> { uDomWarehouseDetail frmWarehouseEdit }
+      fWarehouseEdit -> { uSvcWarehouse dmWarehouse uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fWarehouseReport -> { uDomTypes }
+      fWarehouseReport -> { dmWarehouse uSvcWarehouse uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fCategory -> { frmCategoryList }
+      fCategory -> { fCategoryEdit fCategoryReport dmCategory uSvcCategory uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fCategoryEdit -> { uDomCategoryDetail frmCategoryEdit }
+      fCategoryEdit -> { uSvcCategory dmCategory uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fCategoryReport -> { uDomTypes }
+      fCategoryReport -> { dmCategory uSvcCategory uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fDiscount -> { frmDiscountList }
+      fDiscount -> { fDiscountEdit fDiscountReport dmDiscount uSvcDiscount uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fDiscountEdit -> { uDomDiscountDetail frmDiscountEdit }
+      fDiscountEdit -> { uSvcDiscount dmDiscount uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fDiscountReport -> { uDomTypes }
+      fDiscountReport -> { dmDiscount uSvcDiscount uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fTax -> { frmTaxList }
+      fTax -> { fTaxEdit fTaxReport dmTax uSvcTax uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fTaxEdit -> { uDomTaxDetail frmTaxEdit }
+      fTaxEdit -> { uSvcTax dmTax uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fTaxReport -> { uDomTypes }
+      fTaxReport -> { dmTax uSvcTax uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fCurrency -> { frmCurrencyList }
+      fCurrency -> { fCurrencyEdit fCurrencyReport dmCurrency uSvcCurrency uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fCurrencyEdit -> { uDomCurrencyDetail frmCurrencyEdit }
+      fCurrencyEdit -> { uSvcCurrency dmCurrency uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fCurrencyReport -> { uDomTypes }
+      fCurrencyReport -> { dmCurrency uSvcCurrency uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fContract -> { frmContractList }
+      fContract -> { fContractEdit fContractReport dmContract uSvcContract uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fContractEdit -> { uDomContractDetail frmContractEdit }
+      fContractEdit -> { uSvcContract dmContract uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fContractReport -> { uDomTypes }
+      fContractReport -> { dmContract uSvcContract uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fQuotation -> { frmQuotationList }
+      fQuotation -> { fQuotationEdit fQuotationReport dmQuotation uSvcQuotation uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fQuotationEdit -> { uDomQuotationDetail frmQuotationEdit }
+      fQuotationEdit -> { uSvcQuotation dmQuotation uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fQuotationReport -> { uDomTypes }
+      fQuotationReport -> { dmQuotation uSvcQuotation uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fReturn -> { frmReturnList }
+      fReturn -> { fReturnEdit fReturnReport dmReturn uSvcReturn uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fReturnEdit -> { uDomReturnDetail frmReturnEdit }
+      fReturnEdit -> { uSvcReturn dmReturn uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fReturnReport -> { uDomTypes }
+      fReturnReport -> { dmReturn uSvcReturn uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fRefund -> { frmRefundList }
+      fRefund -> { fRefundEdit fRefundReport dmRefund uSvcRefund uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fRefundEdit -> { uDomRefundDetail frmRefundEdit }
+      fRefundEdit -> { uSvcRefund dmRefund uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fRefundReport -> { uDomTypes }
+      fRefundReport -> { dmRefund uSvcRefund uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fInventory -> { frmInventoryList }
+      fInventory -> { fInventoryEdit fInventoryReport dmInventory uSvcInventory uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fInventoryEdit -> { uDomInventoryDetail frmInventoryEdit }
+      fInventoryEdit -> { uSvcInventory dmInventory uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fInventoryReport -> { uDomTypes }
+      fInventoryReport -> { dmInventory uSvcInventory uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fStock -> { frmStockList }
+      fStock -> { fStockEdit fStockReport dmStock uSvcStock uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fStockEdit -> { uDomStockDetail frmStockEdit }
+      fStockEdit -> { uSvcStock dmStock uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fStockReport -> { uDomTypes }
+      fStockReport -> { dmStock uSvcStock uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fPricing -> { frmPricingList }
+      fPricing -> { fPricingEdit fPricingReport dmPricing uSvcPricing uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fPricingEdit -> { uDomPricingDetail frmPricingEdit }
+      fPricingEdit -> { uSvcPricing dmPricing uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fPricingReport -> { uDomTypes }
+      fPricingReport -> { dmPricing uSvcPricing uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fCampaign -> { frmCampaignList }
+      fCampaign -> { fCampaignEdit fCampaignReport dmCampaign uSvcCampaign uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fCampaignEdit -> { uDomCampaignDetail frmCampaignEdit }
+      fCampaignEdit -> { uSvcCampaign dmCampaign uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fCampaignReport -> { uDomTypes }
+      fCampaignReport -> { dmCampaign uSvcCampaign uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fLead -> { frmLeadList }
+      fLead -> { fLeadEdit fLeadReport dmLead uSvcLead uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fLeadEdit -> { uDomLeadDetail frmLeadEdit }
+      fLeadEdit -> { uSvcLead dmLead uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fLeadReport -> { uDomTypes }
+      fLeadReport -> { dmLead uSvcLead uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fOpportunity -> { frmOpportunityList }
+      fOpportunity -> { fOpportunityEdit fOpportunityReport dmOpportunity uSvcOpportunity uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fOpportunityEdit -> { uDomOpportunityDetail frmOpportunityEdit }
+      fOpportunityEdit -> { uSvcOpportunity dmOpportunity uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fOpportunityReport -> { uDomTypes }
+      fOpportunityReport -> { dmOpportunity uSvcOpportunity uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fContact -> { frmContactList }
+      fContact -> { fContactEdit fContactReport dmContact uSvcContact uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fContactEdit -> { uDomContactDetail frmContactEdit }
+      fContactEdit -> { uSvcContact dmContact uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fContactReport -> { uDomTypes }
+      fContactReport -> { dmContact uSvcContact uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fAccount -> { frmAccountList }
+      fAccount -> { fAccountEdit fAccountReport dmAccount uSvcAccount uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fAccountEdit -> { uDomAccountDetail frmAccountEdit }
+      fAccountEdit -> { uSvcAccount dmAccount uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fAccountReport -> { uDomTypes }
+      fAccountReport -> { dmAccount uSvcAccount uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fTicket -> { frmTicketList }
+      fTicket -> { fTicketEdit fTicketReport dmTicket uSvcTicket uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fTicketEdit -> { uDomTicketDetail frmTicketEdit }
+      fTicketEdit -> { uSvcTicket dmTicket uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fTicketReport -> { uDomTypes }
+      fTicketReport -> { dmTicket uSvcTicket uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fProject -> { frmProjectList }
+      fProject -> { fProjectEdit fProjectReport dmProject uSvcProject uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fProjectEdit -> { uDomProjectDetail frmProjectEdit }
+      fProjectEdit -> { uSvcProject dmProject uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fProjectReport -> { uDomTypes }
+      fProjectReport -> { dmProject uSvcProject uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fTask -> { frmTaskList }
+      fTask -> { fTaskEdit fTaskReport dmTask uSvcTask uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fTaskEdit -> { uDomTaskDetail frmTaskEdit }
+      fTaskEdit -> { uSvcTask dmTask uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fTaskReport -> { uDomTypes }
+      fTaskReport -> { dmTask uSvcTask uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fTimesheet -> { frmTimesheetList }
+      fTimesheet -> { fTimesheetEdit fTimesheetReport dmTimesheet uSvcTimesheet uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fTimesheetEdit -> { uDomTimesheetDetail frmTimesheetEdit }
+      fTimesheetEdit -> { uSvcTimesheet dmTimesheet uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fTimesheetReport -> { uDomTypes }
+      fTimesheetReport -> { dmTimesheet uSvcTimesheet uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fExpense -> { frmExpenseList }
+      fExpense -> { fExpenseEdit fExpenseReport dmExpense uSvcExpense uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fExpenseEdit -> { uDomExpenseDetail frmExpenseEdit }
+      fExpenseEdit -> { uSvcExpense dmExpense uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fExpenseReport -> { uDomTypes }
+      fExpenseReport -> { dmExpense uSvcExpense uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fBudget -> { frmBudgetList }
+      fBudget -> { fBudgetEdit fBudgetReport dmBudget uSvcBudget uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fBudgetEdit -> { uDomBudgetDetail frmBudgetEdit }
+      fBudgetEdit -> { uSvcBudget dmBudget uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fBudgetReport -> { uDomTypes }
+      fBudgetReport -> { dmBudget uSvcBudget uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fLedger -> { frmLedgerList }
+      fLedger -> { fLedgerEdit fLedgerReport dmLedger uSvcLedger uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fLedgerEdit -> { uDomLedgerDetail frmLedgerEdit }
+      fLedgerEdit -> { uSvcLedger dmLedger uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fLedgerReport -> { uDomTypes }
+      fLedgerReport -> { dmLedger uSvcLedger uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fJournal -> { frmJournalList }
+      fJournal -> { fJournalEdit fJournalReport dmJournal uSvcJournal uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fJournalEdit -> { uDomJournalDetail frmJournalEdit }
+      fJournalEdit -> { uSvcJournal dmJournal uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fJournalReport -> { uDomTypes }
+      fJournalReport -> { dmJournal uSvcJournal uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fAsset -> { frmAssetList }
+      fAsset -> { fAssetEdit fAssetReport dmAsset uSvcAsset uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fAssetEdit -> { uDomAssetDetail frmAssetEdit }
+      fAssetEdit -> { uSvcAsset dmAsset uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fAssetReport -> { uDomTypes }
+      fAssetReport -> { dmAsset uSvcAsset uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fDepreciation -> { frmDepreciationList }
+      fDepreciation -> { fDepreciationEdit fDepreciationReport dmDepreciation uSvcDepreciation uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fDepreciationEdit -> { uDomDepreciationDetail frmDepreciationEdit }
+      fDepreciationEdit -> { uSvcDepreciation dmDepreciation uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fDepreciationReport -> { uDomTypes }
+      fDepreciationReport -> { dmDepreciation uSvcDepreciation uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fPayroll -> { frmPayrollList }
+      fPayroll -> { fPayrollEdit fPayrollReport dmPayroll uSvcPayroll uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fPayrollEdit -> { uDomPayrollDetail frmPayrollEdit }
+      fPayrollEdit -> { uSvcPayroll dmPayroll uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fPayrollReport -> { uDomTypes }
+      fPayrollReport -> { dmPayroll uSvcPayroll uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fEmployee -> { frmEmployeeList }
+      fEmployee -> { fEmployeeEdit fEmployeeReport dmEmployee uSvcEmployee uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fEmployeeEdit -> { uDomEmployeeDetail frmEmployeeEdit }
+      fEmployeeEdit -> { uSvcEmployee dmEmployee uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fEmployeeReport -> { uDomTypes }
+      fEmployeeReport -> { dmEmployee uSvcEmployee uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fDepartment -> { frmDepartmentList }
+      fDepartment -> { fDepartmentEdit fDepartmentReport dmDepartment uSvcDepartment uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fDepartmentEdit -> { uDomDepartmentDetail frmDepartmentEdit }
+      fDepartmentEdit -> { uSvcDepartment dmDepartment uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fDepartmentReport -> { uDomTypes }
+      fDepartmentReport -> { dmDepartment uSvcDepartment uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fRole -> { frmRoleList }
+      fRole -> { fRoleEdit fRoleReport dmRole uSvcRole uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fRoleEdit -> { uDomRoleDetail frmRoleEdit }
+      fRoleEdit -> { uSvcRole dmRole uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fRoleReport -> { uDomTypes }
+      fRoleReport -> { dmRole uSvcRole uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fPermission -> { frmPermissionList }
+      fPermission -> { fPermissionEdit fPermissionReport dmPermission uSvcPermission uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fPermissionEdit -> { uDomPermissionDetail frmPermissionEdit }
+      fPermissionEdit -> { uSvcPermission dmPermission uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fPermissionReport -> { uDomTypes }
+      fPermissionReport -> { dmPermission uSvcPermission uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fNotification -> { frmNotificationList }
+      fNotification -> { fNotificationEdit fNotificationReport dmNotification uSvcNotification uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fNotificationEdit -> { uDomNotificationDetail frmNotificationEdit }
+      fNotificationEdit -> { uSvcNotification dmNotification uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fNotificationReport -> { uDomTypes }
+      fNotificationReport -> { dmNotification uSvcNotification uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fReport -> { frmReportList }
+      fReport -> { fReportEdit fReportReport dmReport uSvcReport uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fReportEdit -> { uDomReportDetail frmReportEdit }
+      fReportEdit -> { uSvcReport dmReport uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fReportReport -> { uDomTypes }
+      fReportReport -> { dmReport uSvcReport uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fDashboard -> { frmDashboardList }
+      fDashboard -> { fDashboardEdit fDashboardReport dmDashboard uSvcDashboard uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fDashboardEdit -> { uDomDashboardDetail frmDashboardEdit }
+      fDashboardEdit -> { uSvcDashboard dmDashboard uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fDashboardReport -> { uDomTypes }
+      fDashboardReport -> { dmDashboard uSvcDashboard uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fAudit -> { frmAuditList }
+      fAudit -> { fAuditEdit fAuditReport dmAudit uSvcAudit uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fAuditEdit -> { uDomAuditDetail frmAuditEdit }
+      fAuditEdit -> { uSvcAudit dmAudit uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fAuditReport -> { uDomTypes }
+      fAuditReport -> { dmAudit uSvcAudit uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fSetting -> { frmSettingList }
+      fSetting -> { fSettingEdit fSettingReport dmSetting uSvcSetting uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fSettingEdit -> { uDomSettingDetail frmSettingEdit }
+      fSettingEdit -> { uSvcSetting dmSetting uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fSettingReport -> { uDomTypes }
+      fSettingReport -> { dmSetting uSvcSetting uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fImport -> { frmImportList }
+      fImport -> { fImportEdit fImportReport dmImport uSvcImport uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fImportEdit -> { uDomImportDetail frmImportEdit }
+      fImportEdit -> { uSvcImport dmImport uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fImportReport -> { uDomTypes }
+      fImportReport -> { dmImport uSvcImport uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fExport -> { frmExportList }
+      fExport -> { fExportEdit fExportReport dmExport uSvcExport uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fExportEdit -> { uDomExportDetail frmExportEdit }
+      fExportEdit -> { uSvcExport dmExport uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fExportReport -> { uDomTypes }
+      fExportReport -> { dmExport uSvcExport uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fBatch -> { frmBatchList }
+      fBatch -> { fBatchEdit fBatchReport dmBatch uSvcBatch uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fBatchEdit -> { uDomBatchDetail frmBatchEdit }
+      fBatchEdit -> { uSvcBatch dmBatch uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fBatchReport -> { uDomTypes }
+      fBatchReport -> { dmBatch uSvcBatch uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fSchedule -> { frmScheduleList }
+      fSchedule -> { fScheduleEdit fScheduleReport dmSchedule uSvcSchedule uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fScheduleEdit -> { uDomScheduleDetail frmScheduleEdit }
+      fScheduleEdit -> { uSvcSchedule dmSchedule uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fScheduleReport -> { uDomTypes }
+      fScheduleReport -> { dmSchedule uSvcSchedule uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fReminder -> { frmReminderList }
+      fReminder -> { fReminderEdit fReminderReport dmReminder uSvcReminder uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fReminderEdit -> { uDomReminderDetail frmReminderEdit }
+      fReminderEdit -> { uSvcReminder dmReminder uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fReminderReport -> { uDomTypes }
+      fReminderReport -> { dmReminder uSvcReminder uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fDocument -> { frmDocumentList }
+      fDocument -> { fDocumentEdit fDocumentReport dmDocument uSvcDocument uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fDocumentEdit -> { uDomDocumentDetail frmDocumentEdit }
+      fDocumentEdit -> { uSvcDocument dmDocument uAppContext uKernelExceptions } [arrowhead=open,style=dashed]
+      fDocumentReport -> { uDomTypes }
+      fDocumentReport -> { dmDocument uSvcDocument uAppContext frmAuditLog uKernelUtils } [arrowhead=open,style=dashed]
+      fSplash -> { uKernelConfig } [arrowhead=open,style=dashed]
+      fAbout -> { uKernelConfig uKernelUtils uAppContext } [arrowhead=open,style=dashed]
+      fLogin -> { uDomUser }
+      fLogin -> { uSvcAuth dmMain uAppContext uKernelConfig uKernelExceptions } [arrowhead=open,style=dashed]
+      fSettings -> { dmMain uAppContext uKernelConfig uKernelContainer uKernelUtils } [arrowhead=open,style=dashed]
+      fUserAdmin -> { uDomUser }
+      fUserAdmin -> { dmMain uSvcAuth uDbUserRepo uAppContext uKernelUtils } [arrowhead=open,style=dashed]
+      fMain -> { uKernelEvents }
+      fMain -> { fLogin fSettings fUserAdmin fAbout dmMain uSvcAuth uSvcNotification uKernelLog uKernelConfig uKernelContainer uKernelUtils fCustomer fOrder fProduct fInvoice fShipment fPayment fSupplier fWarehouse fCategory fDiscount fTax fCurrency fContract fQuotation fReturn fRefund fInventory fStock fPricing fCampaign fLead fOpportunity fContact fAccount fTicket fProject fTask fTimesheet fExpense fBudget fLedger fJournal fAsset fDepreciation fPayroll fEmployee fDepartment fRole fPermission fNotification fReport fDashboard fAudit fSetting fImport fExport fBatch fSchedule fReminder fDocument } [arrowhead=open,style=dashed]
+}

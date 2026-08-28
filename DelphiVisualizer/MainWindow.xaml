@@ -130,6 +130,13 @@
             </Popup>
           </Grid>
 
+          <Button x:Name="BtnFindUnit" Content="…"
+                  Style="{StaticResource ToolbarButton}"
+                  Click="BtnFindUnit_Click"
+                  IsEnabled="False"
+                  ToolTip="{s:L findunit.title}"
+                  Width="34" Padding="0" Margin="0,0,12,0"/>
+
           <Button x:Name="BtnAnalyze" Content="▶ Analysieren"
                   Style="{StaticResource ToolbarButton}"
                   Click="BtnAnalyze_Click"
@@ -219,6 +226,12 @@
             </StackPanel>
           </Border>
 
+          <!-- List caption -->
+          <TextBlock DockPanel.Dock="Top"
+                     Text="{s:L sidebar.listCaption}"
+                     Foreground="#607090" FontSize="9" FontWeight="SemiBold"
+                     Margin="2,0,0,3"/>
+
           <!-- Unit count -->
           <TextBlock x:Name="TbUnitCount" DockPanel.Dock="Top"
                      Foreground="#8899BB" FontSize="11"
@@ -230,11 +243,24 @@
                    BorderThickness="0"
                    ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                    VirtualizingPanel.IsVirtualizing="True"
-                   ItemContainerStyle="{StaticResource UnitListItem}"
-                   SelectionChanged="LbUnits_SelectionChanged">
+                   SelectionChanged="LbUnits_SelectionChanged"
+                   PreviewMouseRightButtonDown="LbUnits_PreviewMouseRightButtonDown">
+            <ListBox.ItemContainerStyle>
+              <Style TargetType="ListBoxItem" BasedOn="{StaticResource UnitListItem}">
+                <EventSetter Event="MouseDoubleClick" Handler="LbUnitsItem_MouseDoubleClick"/>
+              </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ContextMenu>
+              <ContextMenu Style="{StaticResource DarkContextMenu}">
+                <MenuItem Header="{s:L sidebar.ctxSelect}" Style="{StaticResource DarkMenuItem}"
+                          Click="MenuUnitSelect_Click"/>
+                <MenuItem Header="{s:L sidebar.ctxOpen}" Style="{StaticResource DarkMenuItem}"
+                          Click="MenuUnitOpen_Click"/>
+              </ContextMenu>
+            </ListBox.ContextMenu>
             <ListBox.ItemTemplate>
               <DataTemplate>
-                <StackPanel Orientation="Horizontal">
+                <StackPanel Orientation="Horizontal" Opacity="{Binding RowOpacity}">
                   <Ellipse Width="8" Height="8" Margin="0,0,6,0"
                            VerticalAlignment="Center"
                            Fill="{Binding Brush}"/>

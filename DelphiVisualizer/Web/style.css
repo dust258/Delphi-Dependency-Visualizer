@@ -16,6 +16,7 @@
   --datamodule-color: #A5D6A7;
   --frame-color: #FFB74D;
   --unit-color: #B0BEC5;
+  --program-color: #CE93D8;
   --root-color: #FF6B6B;
   --cycle-color: #FF5252;
   --missing-color: #616161;
@@ -79,6 +80,7 @@ html, body {
 .type-DataModule { background: rgba(165,214,167,0.2); color: var(--datamodule-color); }
 .type-Frame      { background: rgba(255,183,77,0.2); color: var(--frame-color); }
 .type-Unit       { background: rgba(176,190,197,0.15); color: var(--unit-color); }
+.type-Program    { background: rgba(206,147,216,0.2); color: var(--program-color); }
 
 .info-row {
   display: flex;
@@ -345,6 +347,23 @@ html, body {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 #loading p { color: var(--text-secondary); font-size: 13px; }
+
+#loading-progress {
+  width: 240px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(100,181,246,0.15);
+  overflow: hidden;
+  display: none;
+}
+#loading-progress.visible { display: block; }
+#loading-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.15s linear;
+}
 
 /* ── Legend ──────────────────────────────────────────────── */
 #legend {

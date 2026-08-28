@@ -31,6 +31,9 @@
   "status.loadError": "Ошибка загрузки",
 
   "sidebar.labelGraphFilter": "ФИЛЬТР ГРАФА",
+  "sidebar.listCaption": "ССЫЛАЕМЫЕ МОДУЛИ",
+  "sidebar.ctxSelect": "Выбрать",
+  "sidebar.ctxOpen": "Открыть (как корневой модуль)",
   "sidebar.cbFormsOnly": "Только формы",
   "sidebar.cbSameDir": "Только тот же каталог",
   "sidebar.cbUsesFiltered": "Содержит отфильтрованные модули",
@@ -42,7 +45,7 @@
   "sidebar.unitCount": "{0} / {1} модулей",
 
   "filedialog.openTitle": "Открыть проект Delphi",
-  "filedialog.openFilter": "Проект Delphi (*.dpr)|*.dpr",
+  "filedialog.openFilter": "Все поддерживаемые (*.dpr;*.gv;*.dot)|*.dpr;*.gv;*.dot|Проект Delphi (*.dpr)|*.dpr|Экспорт GraphViz (*.gv;*.dot)|*.gv;*.dot",
 
   "options.title": "Настройки — Delphi Visualizer",
   "options.sectionDisplay": "ОТОБРАЖЕНИЕ",
@@ -53,6 +56,9 @@
   "options.btnOk": "ОК",
   "options.btnCancel": "Отмена",
   "options.validationMaxNodes": "Пожалуйста, введите допустимое число (не менее 100).",
+
+  "findunit.title": "Поиск модуля",
+  "findunit.btnSelect": "Выбрать",
 
   "errors.title": "Ошибка",
   "errors.loadFailed": "Ошибка загрузки:\n{0}",
@@ -91,6 +97,7 @@
   "help.aboutVersion": "Delphi Dependency Visualizer",
 
   "loading.analyzing": "Анализ зависимостей…",
+  "loading.parsing": "Разбор модулей {0} / {1}…",
   "loading.computingLayout": "Вычисление макета…",
 
   "error.libraryLoad": "⚠ Ошибка загрузки 3D-библиотеки",

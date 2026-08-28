@@ -224,6 +224,27 @@ public partial class MainWindow : Window
         };
         if (dlg.ShowDialog() != true) return;
         LoadProject(dlg.FileName);
+
+        // Render a graph straight away instead of leaving the user on a blank
+        // view (same as session-restore). Uses the pre-selected start unit.
+        if (BtnAnalyze.IsEnabled && !string.IsNullOrEmpty(_selectedUnit))
+            AnalyzeDependencies(_selectedUnit);
+    }
+
+    private void BtnFindUnit_Click(object sender, RoutedEventArgs e)
+    {
+        if (_allUnitNames.Count == 0) return;
+
+        var units = _projectUnits.Values
+            .Where(u => u.FileFound)
+            .Select(u => (u.Name, Path: u.FilePath, u.UnitType));
+
+        var dlg = new FindUnitDialog(units, _selectedUnit) { Owner = this };
+        if (dlg.ShowDialog() == true && !string.IsNullOrEmpty(dlg.SelectedUnit))
+        {
+            SelectUnit(dlg.SelectedUnit);
+            BtnAnalyze.IsEnabled = true;
+        }
     }
 
     private void LoadProject(string dprPath, string? preferUnit = null)
@@ -232,10 +253,27 @@ public partial class MainWindow : Window
         {
             SetStatus(T("status.loading"));
             _currentProjectPath = dprPath;
-            _projectUnits = DprParser.Parse(dprPath);
-            NodeClassifier.ClassifyAll(_projectUnits);
 
-            _allUnitNames = _projectUnits.Keys
+            var ext = System.IO.Path.GetExtension(dprPath);
+            if (ext.Equals(".gv", StringComparison.OrdinalIgnoreCase) ||
+                ext.Equals(".dot", StringComparison.OrdinalIgnoreCase))
+            {
+                // Compiler-generated GraphViz export: uses-edges already resolved,
+                // no on-disk file paths to classify Form/DataModule/Frame from.
+                _projectUnits = GraphVizParser.Parse(dprPath);
+            }
+            else
+            {
+                _projectUnits = DprParser.Parse(dprPath);
+                NodeClassifier.ClassifyAll(_projectUnits);
+            }
+
+            // Only units with a real .pas file are valid analysis roots — skip
+            // the pseudo-entries the .dpr parser produces for dotted RTL units
+            // (Vcl.Forms -> "Vcl", "Forms"), which resolve to nothing.
+            _allUnitNames = _projectUnits.Values
+                .Where(u => u.FileFound)
+                .Select(u => u.Name)
                 .OrderBy(k => k, StringComparer.OrdinalIgnoreCase)
                 .ToList();
 
@@ -250,6 +288,16 @@ public partial class MainWindow : Window
             TbUnitSearch.IsEnabled = true;
             SlDepth.IsEnabled = true;
             BtnAnalyze.IsEnabled = _allUnitNames.Count > 0;
+            BtnFindUnit.IsEnabled = _allUnitNames.Count > 0;
+
+            // Drop analysis state from any previously opened project and show the
+            // new project's full unit list right away (Analyse then narrows it to
+            // the reachable dependency graph with cycle highlighting).
+            _currentGraph = null;
+            PopulateSidebarWithAllUnits();
+            UpdateWindowTitle();
+            if (_webViewReady)
+                _ = WebView.ExecuteScriptAsync("clearGraph()");
             SetStatus(T("status.projectLoaded", _projectUnits.Count, System.IO.Path.GetFileName(dprPath)));
         }
         catch (Exception ex)
@@ -469,18 +517,32 @@ public partial class MainWindow : Window
         SaveSettings();
         _ = WebView.ExecuteScriptAsync($"showLoading('{EscapeJson(T("loading.analyzing"))}')");
 
-
         var maxDepth = (int)SlDepth.Value >= 10 ? int.MaxValue : (int)SlDepth.Value;
+
+        // Progress<T> captures the current SynchronizationContext, so the callback
+        // runs back on the UI thread — safe to touch WebView from here.
+        var progress = new Progress<(int done, int total)>(p =>
+        {
+            var pct = p.total > 0 ? p.done * 100 / p.total : 0;
+            var text = EscapeJson(T("loading.parsing", p.done, p.total));
+            _ = WebView.ExecuteScriptAsync($"updateLoading('{text}', {pct})");
+        });
 
         Task.Run(() =>
         {
-            var graph = DependencyResolver.Resolve(rootUnit, _projectUnits, maxDepth);
+            var graph = DependencyResolver.Resolve(rootUnit, _projectUnits, maxDepth, progress);
             var json = GraphBuilder.BuildJson(graph);
 
             Dispatcher.Invoke(() =>
             {
                 _currentGraph = graph;
+                UpdateWindowTitle();
                 BuildSidebarList(graph);
+
+                // Mark the root in the list without re-triggering a graph highlight.
+                _suppressSidebarHighlight = true;
+                SelectUnitInSidebar(graph.RootUnit);
+                _suppressSidebarHighlight = false;
 
                 if (_webViewReady)
                     SendGraphToWebView(json);
@@ -511,28 +573,51 @@ public partial class MainWindow : Window
             foreach (var n in cycle)
                 cycleNodes.Add(n);
 
-        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-        void AddIfNew(string name)
+        var inGraph = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { graph.RootUnit };
+        foreach (var edge in graph.Edges)
         {
-            if (!seen.Add(name)) return;
-            graph.Units.TryGetValue(name, out var unit);
-            var unitType = unit?.UnitType ?? "Unit";
-            var isInCycle = cycleNodes.Contains(name);
+            inGraph.Add(edge.Source);
+            inGraph.Add(edge.Target);
+        }
+
+        // The list always shows the whole project. Analysis only enriches it:
+        // cycle marking, and dimming of units outside the current (possibly
+        // depth-limited) dependency graph.
+        foreach (var unit in _projectUnits.Values
+                     .Where(u => u.FileFound)
+                     .OrderBy(u => u.Name, StringComparer.OrdinalIgnoreCase))
+        {
+            var isInCycle = cycleNodes.Contains(unit.Name);
             _allUnitItems.Add(new UnitListItem
             {
-                Name = name,
-                UnitType = unitType,
+                Name = unit.Name,
+                UnitType = unit.UnitType,
                 IsInCycle = isInCycle,
-                Brush = MakeBrush(name, unitType, graph.RootUnit, isInCycle)
+                InGraph = inGraph.Contains(unit.Name),
+                Brush = MakeBrush(unit.Name, unit.UnitType, graph.RootUnit, isInCycle)
             });
         }
 
-        AddIfNew(graph.RootUnit);
-        foreach (var edge in graph.Edges)
+        ApplyFilter();
+    }
+
+    // Sidebar content right after a project is opened, before any analysis:
+    // every unit with a resolved file, coloured by type, no cycle info yet.
+    private void PopulateSidebarWithAllUnits()
+    {
+        _allUnitItems.Clear();
+
+        foreach (var unit in _projectUnits.Values
+                     .Where(u => u.FileFound)
+                     .OrderBy(u => u.Name, StringComparer.OrdinalIgnoreCase))
         {
-            AddIfNew(edge.Source);
-            AddIfNew(edge.Target);
+            _allUnitItems.Add(new UnitListItem
+            {
+                Name = unit.Name,
+                UnitType = unit.UnitType,
+                IsInCycle = false,
+                Brush = MakeBrush(unit.Name, unit.UnitType, _selectedUnit, false)
+            });
         }
 
         ApplyFilter();
@@ -548,6 +633,7 @@ public partial class MainWindow : Window
                 "Form"       => "#4FC3F7",
                 "DataModule" => "#A5D6A7",
                 "Frame"      => "#FFB74D",
+                "Program"    => "#CE93D8",
                 _            => "#B0BEC5"
             };
         return new SolidColorBrush((Color)ColorConverter.ConvertFromString(hex));
@@ -586,10 +672,59 @@ public partial class MainWindow : Window
         }
     }
 
+    private bool _suppressSidebarHighlight;
+
     private void LbUnits_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
+        if (_suppressSidebarHighlight) return;
         if (LbUnits.SelectedItem is UnitListItem item)
+            SelectSidebarUnit(item);
+    }
+
+    // "Auswählen": highlight the unit in the current graph, or — if nothing has
+    // been analysed yet — just make it the pending start unit.
+    private void SelectSidebarUnit(UnitListItem item)
+    {
+        if (_currentGraph == null)
+            SelectUnit(item.Name);
+        else
             _ = WebView.ExecuteScriptAsync($"highlightNode('{item.Name}')");
+    }
+
+    // "Öffnen": make the unit the root and (re-)run the analysis from it.
+    private void OpenSidebarUnitAsRoot(UnitListItem item)
+    {
+        if (!_projectUnits.TryGetValue(item.Name, out var u) || !u.FileFound) return;
+        SelectUnit(item.Name);
+        AnalyzeDependencies(item.Name);
+    }
+
+    // Right-click selects the row it lands on so the context menu handlers act on
+    // the intended unit.
+    private void LbUnits_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if ((e.OriginalSource as FrameworkElement)?.DataContext is UnitListItem item)
+            LbUnits.SelectedItem = item;
+    }
+
+    // Double-click handled on the container itself — ListBox.MouseDoubleClick is
+    // swallowed by the item's own selection handling.
+    private void LbUnitsItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        if ((sender as ListBoxItem)?.DataContext is UnitListItem item)
+            OpenSidebarUnitAsRoot(item);
+    }
+
+    private void MenuUnitSelect_Click(object sender, RoutedEventArgs e)
+    {
+        if (LbUnits.SelectedItem is UnitListItem item)
+            SelectSidebarUnit(item);
+    }
+
+    private void MenuUnitOpen_Click(object sender, RoutedEventArgs e)
+    {
+        if (LbUnits.SelectedItem is UnitListItem item)
+            OpenSidebarUnitAsRoot(item);
     }
 
     private void TbSearch_TextChanged(object sender, TextChangedEventArgs e)
@@ -679,8 +814,26 @@ public partial class MainWindow : Window
     private void OnLanguageChanged()
     {
         // WPF-Properties die nicht per {s:L} gebunden sind hier manuell aktualisieren
-        TbStatus.Text = T("status.noProjectLoaded");
-        Title = T("app.title");
+        if (string.IsNullOrEmpty(_currentProjectPath))
+            TbStatus.Text = T("status.noProjectLoaded");
+        UpdateWindowTitle();
+    }
+
+    // Fenstertitel zeigt immer das aktuell geladene Projekt (und die analysierte
+    // Start-Unit, sobald ein Graph berechnet wurde).
+    private void UpdateWindowTitle()
+    {
+        var app = T("app.title");
+        if (string.IsNullOrEmpty(_currentProjectPath))
+        {
+            Title = app;
+            return;
+        }
+
+        var project = System.IO.Path.GetFileName(_currentProjectPath);
+        Title = _currentGraph != null && !string.IsNullOrEmpty(_selectedUnit)
+            ? $"{project}  –  {_selectedUnit}  –  {app}"
+            : $"{project}  –  {app}";
     }
 
     // ── Optionen ─────────────────────────────────────────────
@@ -750,4 +903,9 @@ public class UnitListItem
     public string UnitType { get; set; } = "Unit";
     public bool IsInCycle { get; set; }
     public SolidColorBrush Brush { get; set; } = Brushes.Gray;
+
+    // False = unit exists in the project but is outside the current analysed
+    // graph (e.g. cut off by the depth limit); shown dimmed.
+    public bool InGraph { get; set; } = true;
+    public double RowOpacity => InGraph ? 1.0 : 0.4;
 }

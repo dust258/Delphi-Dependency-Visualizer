@@ -31,6 +31,9 @@
   "status.loadError": "Load error",
 
   "sidebar.labelGraphFilter": "GRAPH FILTER",
+  "sidebar.listCaption": "REFERENCED UNITS",
+  "sidebar.ctxSelect": "Select",
+  "sidebar.ctxOpen": "Open (as root unit)",
   "sidebar.cbFormsOnly": "Forms only",
   "sidebar.cbSameDir": "Same directory only",
   "sidebar.cbUsesFiltered": "Contains filtered units",
@@ -42,7 +45,7 @@
   "sidebar.unitCount": "{0} / {1} units",
 
   "filedialog.openTitle": "Open Delphi Project",
-  "filedialog.openFilter": "Delphi Project (*.dpr)|*.dpr",
+  "filedialog.openFilter": "All Supported (*.dpr;*.gv;*.dot)|*.dpr;*.gv;*.dot|Delphi Project (*.dpr)|*.dpr|GraphViz Export (*.gv;*.dot)|*.gv;*.dot",
 
   "options.title": "Options — Delphi Visualizer",
   "options.sectionDisplay": "DISPLAY",
@@ -53,6 +56,9 @@
   "options.btnOk": "OK",
   "options.btnCancel": "Cancel",
   "options.validationMaxNodes": "Please enter a valid number (at least 100).",
+
+  "findunit.title": "Find Unit",
+  "findunit.btnSelect": "Select",
 
   "errors.title": "Error",
   "errors.loadFailed": "Load error:\n{0}",
@@ -91,6 +97,7 @@
   "help.aboutVersion": "Delphi Dependency Visualizer",
 
   "loading.analyzing": "Analysing dependencies…",
+  "loading.parsing": "Parsing units {0} / {1}…",
   "loading.computingLayout": "Computing layout…",
 
   "error.libraryLoad": "⚠ Error loading 3D library",

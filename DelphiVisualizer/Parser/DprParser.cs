@@ -6,8 +6,9 @@ namespace DelphiVisualizer.Parser;
 
 public static class DprParser
 {
+    // Unit name may be dotted (namespaced): Favoriten.Akquise, System.SysUtils …
     private static readonly Regex UnitEntryRegex =
-        new(@"(\w+)\s*(?:in\s*'([^']+)')?", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        new(@"([\w.]+)\s*(?:in\s*'([^']+)')?", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     public static Dictionary<string, ProjectUnit> Parse(string dprPath)
     {
@@ -20,8 +21,8 @@ public static class DprParser
 
         foreach (Match m in UnitEntryRegex.Matches(usesBlock))
         {
-            var name = m.Groups[1].Value.Trim();
-            if (string.IsNullOrEmpty(name) || IsKeyword(name))
+            var name = m.Groups[1].Value.Trim().Trim('.');
+            if (string.IsNullOrEmpty(name) || IsKeyword(name) || !name.Any(char.IsLetterOrDigit))
                 continue;
 
             var relPath = m.Groups[2].Success ? m.Groups[2].Value.Trim() : name + ".pas";

@@ -206,5 +206,56 @@
         </Setter.Value>
       </Setter>
     </Style>
+
+    <!-- Dark context menu (opt-in via Style / ItemContainerStyle) -->
+    <Style TargetType="ContextMenu" x:Key="DarkContextMenu">
+      <Setter Property="Background" Value="#101828"/>
+      <Setter Property="BorderBrush" Value="#2A3A60"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="Foreground" Value="#E0E6F0"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="ContextMenu">
+            <Border Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="6" Padding="3"
+                    SnapsToDevicePixels="True">
+              <Border.Effect>
+                <DropShadowEffect Color="#000000" BlurRadius="12"
+                                  ShadowDepth="4" Opacity="0.5"/>
+              </Border.Effect>
+              <StackPanel IsItemsHost="True"
+                          KeyboardNavigation.DirectionalNavigation="Cycle"/>
+            </Border>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style TargetType="MenuItem" x:Key="DarkMenuItem">
+      <Setter Property="Foreground" Value="#E0E6F0"/>
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Padding" Value="12,6"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="MenuItem">
+            <Border x:Name="b" Background="{TemplateBinding Background}"
+                    CornerRadius="4" Padding="{TemplateBinding Padding}">
+              <ContentPresenter ContentSource="Header" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsHighlighted" Value="True">
+                <Setter TargetName="b" Property="Background" Value="#1E2D50"/>
+              </Trigger>
+              <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.4"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
   </Application.Resources>
 </Application>

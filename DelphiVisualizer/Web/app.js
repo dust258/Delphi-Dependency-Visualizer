@@ -132,6 +132,15 @@ function computeDepths(nodes, links, rootId) {
  */
 const NODE_REL_SIZE = 4; // must match .nodeRelSize() above
 
+// Start unit is drawn much larger than the rest. The factor scales with graph
+// size: 1000 (radius 80) for big graphs, but small graphs get a smaller root so
+// it doesn't swallow its few neighbours / the camera.
+let rootNodeVal = 1000;
+function rootValForGraph(nodeCount) {
+  return Math.min(1000, Math.max(30, nodeCount * 2));
+}
+const ROOT_REL_SIZE = 8; // = .nodeRelSize(8)
+
 function sphereRadius(val) {
   return Math.cbrt(Math.min(val ?? 1, 6)) * NODE_REL_SIZE;
 }
@@ -348,7 +357,7 @@ function initGraph() {
         <span style="font-size:10px;color:#8899BB">${node.unitType}${node.__depth !== undefined ? ' · ' + t('tooltip.depth', node.__depth) : ''}</span>
         </div>`)
       .nodeColor(node => node.color)
-      .nodeVal(node => node.isRoot ? 1000 : Math.min(node.val ?? 1, 6))
+      .nodeVal(node => node.isRoot ? rootNodeVal : Math.min(node.val ?? 1, 6))
       .nodeRelSize(8)
       .nodeOpacity(1.0)
       .linkColor(link => link.isCyclic ? '#FF5252' : '#3A557F')
@@ -638,6 +647,7 @@ window.loadGraph = function(data) {
   setTimeout(() => {
     try {
       currentData = data;
+      rootNodeVal = rootValForGraph((data.nodes || []).length);
       cycleNodeSet = new Set();
       (data.cycles || []).forEach(cycle =>
         cycle.forEach(name => cycleNodeSet.add(name)));
@@ -765,7 +775,9 @@ function rootTopCamera(rootAxis) {
     // 3D/force mode: root at (0,0,0), depth on negative Z, rings in XY
     const spanZ  = Math.max(...zs) - Math.min(...zs);
     const spanXY = Math.max(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys)) + 1;
-    const dist   = Math.max(spanZ, spanXY);
+    // Never place the camera so close that the (enlarged) root fills the view.
+    const rootR  = Math.cbrt(rootNodeVal) * ROOT_REL_SIZE;
+    const dist   = Math.max(spanZ, spanXY, rootR * 5);
     const a      = 30 * Math.PI / 180;
     const vd     = dist * 0.8;
 
@@ -979,8 +991,8 @@ function optimizeNodeGeometries() {
   nodes.forEach(node => {
     const mesh = node.__threeObj;
     if (!mesh?.geometry) return;
-    // Root-Knoten: val=1000 → Radius = cbrt(1000)*8 = 10*8 = 80 (≈10× normaler Knoten)
-    const val = node.isRoot ? 1000 : Math.min(node.val ?? 1, 6);
+    // Root-Knoten: val=rootNodeVal (max. 1000 → Radius 80, wächst mit der Graphgröße)
+    const val = node.isRoot ? rootNodeVal : Math.min(node.val ?? 1, 6);
     const geo = getGeo(val);
     if (mesh.geometry === geo) return;
     mesh.geometry.dispose();

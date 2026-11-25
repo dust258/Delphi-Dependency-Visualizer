@@ -40,8 +40,18 @@ public static class DependencyResolver
                 progress?.Report((done, total));
         }
 
-        if (!projectUnits.ContainsKey(rootUnitName))
+        if (!projectUnits.TryGetValue(rootUnitName, out var rootUnit))
             return graph;
+
+        // Use the canonical spelling of the root so edges/nodes match regardless
+        // of how the caller (or a uses clause) cased the name.
+        rootUnitName = rootUnit.Name;
+        graph.RootUnit = rootUnitName;
+
+        // Shortest distance from the root. The DFS below decides expansion by
+        // this value rather than by the depth at which it happens to reach a
+        // unit first, so the depth limit no longer depends on uses-clause order.
+        var minDepth = ComputeMinDepths(rootUnitName, projectUnits);
 
         var stack = new Stack<StackFrame>();
         stack.Push(new StackFrame(rootUnitName, null, "interface", false, 0));
@@ -58,10 +68,12 @@ public static class DependencyResolver
                 continue;
             }
 
-            var name = frame.UnitName;
-
-            if (!projectUnits.TryGetValue(name, out var unit) || !unit.FileFound)
+            if (!projectUnits.TryGetValue(frame.UnitName, out var unit) || !unit.FileFound)
                 continue;  // skip stdlib/external units (no .pas in project)
+
+            // Canonical name: Delphi is case-insensitive, so "sysutils" and
+            // "SysUtils" must yield the same node id in edges and cycles.
+            var name = unit.Name;
 
             colors.TryGetValue(name, out var color);
 
@@ -92,8 +104,8 @@ public static class DependencyResolver
 
             stack.Push(new StackFrame(name, null, "", true, frame.Depth));
 
-            // Stop expanding beyond maxDepth
-            if (frame.Depth >= maxDepth) continue;
+            // Stop expanding at maxDepth (measured as shortest distance from root)
+            if (minDepth.GetValueOrDefault(name, int.MaxValue) >= maxDepth) continue;
 
             foreach (var dep in unit.ImplementationUses.AsEnumerable().Reverse())
                 stack.Push(new StackFrame(dep, name, "implementation", false, frame.Depth + 1));
@@ -103,6 +115,30 @@ public static class DependencyResolver
         }
 
         return graph;
+    }
+
+    private static Dictionary<string, int> ComputeMinDepths(
+        string rootName, Dictionary<string, ProjectUnit> projectUnits)
+    {
+        var depth = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase) { [rootName] = 0 };
+        var queue = new Queue<string>();
+        queue.Enqueue(rootName);
+
+        while (queue.Count > 0)
+        {
+            var current = queue.Dequeue();
+            var d = depth[current];
+            var unit = projectUnits[current];
+
+            foreach (var dep in unit.InterfaceUses.Concat(unit.ImplementationUses))
+            {
+                if (!projectUnits.TryGetValue(dep, out var depUnit) || !depUnit.FileFound) continue;
+                if (depth.ContainsKey(depUnit.Name)) continue;
+                depth[depUnit.Name] = d + 1;
+                queue.Enqueue(depUnit.Name);
+            }
+        }
+        return depth;
     }
 
     private static void AddEdge(DependencyGraph graph, HashSet<string> edgeSet,

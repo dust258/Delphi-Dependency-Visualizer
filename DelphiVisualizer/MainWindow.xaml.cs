@@ -109,6 +109,14 @@ public partial class MainWindow : Window
             "app.local", webFolder, CoreWebView2HostResourceAccessKind.Allow);
 
         WebView.CoreWebView2.WebMessageReceived += CoreWebView2_WebMessageReceived;
+        // Route uncaught JS errors / console.error into the log buffer (get_log).
+        await WebView.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(@"
+(function(){
+  function send(m){ try{ window.chrome.webview.postMessage(JSON.stringify({type:'log',msg:m})); }catch(_){} }
+  window.addEventListener('error', function(e){ send('[JS error] '+e.message+' @'+(e.filename||'')+':'+e.lineno); });
+  window.addEventListener('unhandledrejection', function(e){ send('[JS unhandled rejection] '+(e.reason&&e.reason.stack||e.reason)); });
+  var ce=console.error; console.error=function(){ send('[console.error] '+Array.prototype.join.call(arguments,' ')); ce.apply(console,arguments); };
+})();");
         WebView.CoreWebView2.Settings.AreDevToolsEnabled = true;
         WebView.CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = true;
         WebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
@@ -168,6 +176,7 @@ public partial class MainWindow : Window
             {
                 var logMsg = msg.GetValueOrDefault("msg").GetString() ?? "";
                 var line = $"[{DateTime.Now:HH:mm:ss.fff}] {logMsg}";
+                AddLog(line);
                 System.IO.File.AppendAllText(@"C:\temp\graph-log.txt", line + "\n");
                 return;
             }
@@ -302,8 +311,11 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            MessageBox.Show(T("errors.loadFailed", ex.Message),
-                T("errors.title"), MessageBoxButton.OK, MessageBoxImage.Error);
+            _lastError = ex.ToString();
+            AddLog($"[{DateTime.Now:HH:mm:ss.fff}] Load failed: {ex}");
+            if (_mcp == null)
+                MessageBox.Show(T("errors.loadFailed", ex.Message),
+                    T("errors.title"), MessageBoxButton.OK, MessageBoxImage.Error);
             SetStatus(T("status.loadError"));
         }
     }
@@ -510,12 +522,21 @@ public partial class MainWindow : Window
         TbDepth.Text = v >= 10 ? "∞" : v.ToString();
     }
 
-    private void AnalyzeDependencies(string rootUnit)
+    private bool _analyzing;
+
+    private Task AnalyzeDependencies(string rootUnit)
     {
+        // Ignore re-entrant requests: the resolver caches parse results on the
+        // shared ProjectUnit objects and is not safe to run twice concurrently.
+        if (_analyzing) return Task.CompletedTask;
+        _analyzing = true;
+        _lastError = null;
+
         SetStatus(T("status.analyzing"));
         _selectedUnit = rootUnit;
         SaveSettings();
-        _ = WebView.ExecuteScriptAsync($"showLoading('{EscapeJson(T("loading.analyzing"))}')");
+        if (_webViewReady)
+            _ = WebView.ExecuteScriptAsync($"showLoading('{EscapeJson(T("loading.analyzing"))}')");
 
         var maxDepth = (int)SlDepth.Value >= 10 ? int.MaxValue : (int)SlDepth.Value;
 
@@ -523,36 +544,60 @@ public partial class MainWindow : Window
         // runs back on the UI thread — safe to touch WebView from here.
         var progress = new Progress<(int done, int total)>(p =>
         {
+            if (!_webViewReady) return;
             var pct = p.total > 0 ? p.done * 100 / p.total : 0;
             var text = EscapeJson(T("loading.parsing", p.done, p.total));
             _ = WebView.ExecuteScriptAsync($"updateLoading('{text}', {pct})");
         });
 
-        Task.Run(() =>
+        return Task.Run(() =>
         {
-            var graph = DependencyResolver.Resolve(rootUnit, _projectUnits, maxDepth, progress);
-            var json = GraphBuilder.BuildJson(graph);
-
-            Dispatcher.Invoke(() =>
+            try
             {
-                _currentGraph = graph;
-                UpdateWindowTitle();
-                BuildSidebarList(graph);
+                var graph = DependencyResolver.Resolve(rootUnit, _projectUnits, maxDepth, progress);
+                var json = GraphBuilder.BuildJson(graph);
 
-                // Mark the root in the list without re-triggering a graph highlight.
-                _suppressSidebarHighlight = true;
-                SelectUnitInSidebar(graph.RootUnit);
-                _suppressSidebarHighlight = false;
+                Dispatcher.Invoke(() =>
+                {
+                    _currentGraph = graph;
+                    UpdateWindowTitle();
+                    BuildSidebarList(graph);
 
-                if (_webViewReady)
-                    SendGraphToWebView(json);
-                else
-                    _pendingGraphJson = json;
+                    // Mark the root in the list without re-triggering a graph highlight.
+                    _suppressSidebarHighlight = true;
+                    SelectUnitInSidebar(graph.RootUnit);
+                    _suppressSidebarHighlight = false;
 
-                var cycleText = graph.Cycles.Count > 0
-                    ? T("status.cycles", graph.Cycles.Count) : "";
-                SetStatus(T("status.graphLoaded", graph.Units.Count, graph.Edges.Count) + cycleText);
-            });
+                    if (_webViewReady)
+                        SendGraphToWebView(json);
+                    else
+                        _pendingGraphJson = json;
+
+                    var cycleText = graph.Cycles.Count > 0
+                        ? T("status.cycles", graph.Cycles.Count) : "";
+                    SetStatus(T("status.graphLoaded", graph.Units.Count, graph.Edges.Count) + cycleText);
+                });
+            }
+            catch (Exception ex)
+            {
+                // Without this the exception is swallowed by the Task, the loading
+                // overlay never closes and the status stays on "Analysing…".
+                Dispatcher.Invoke(() =>
+                {
+                    if (_webViewReady)
+                        _ = WebView.ExecuteScriptAsync("clearGraph()"); // also hides the overlay
+                    SetStatus(T("status.loadError"));
+                    _lastError = ex.ToString();
+                    AddLog($"[{DateTime.Now:HH:mm:ss.fff}] Analysis failed: {ex}");
+                    if (_mcp == null) // a modal box would block remote control
+                        MessageBox.Show(T("errors.loadFailed", ex.Message),
+                            T("errors.title"), MessageBoxButton.OK, MessageBoxImage.Error);
+                });
+            }
+            finally
+            {
+                Dispatcher.Invoke(() => _analyzing = false);
+            }
         });
     }
 
@@ -778,6 +823,8 @@ public partial class MainWindow : Window
     {
         var activeStyle   = (Style)FindResource("LayoutButtonActive");
         var defaultStyle  = (Style)FindResource("LayoutButton");
+        _layoutMode = active == BtnLayered ? "layered" : active == BtnTree ? "tree"
+                    : active == BtnRadial ? "radial" : "force";
         foreach (var btn in new[] { BtnLayered, BtnForce, BtnTree, BtnRadial })
             btn.Style = btn == active ? activeStyle : defaultStyle;
     }

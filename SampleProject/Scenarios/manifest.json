@@ -1,0 +1,108 @@
+{
+  "direct_pair": {
+    "note": "A <-> B, both in interface uses (illegal in Delphi, must still be detected)",
+    "root": "UnitA",
+    "depth": 10,
+    "min_cycles": 1,
+    "must_contain": null,
+    "must_not_contain": null,
+    "dpr": "C:\\Entwicklung\\Delphi Visualizer\\SampleProject\\Scenarios\\direct_pair\\direct_pair.dpr"
+  },
+  "impl_cycle": {
+    "note": "A uses B in interface, B uses A in implementation (the legal Delphi pattern)",
+    "root": "UnitA",
+    "depth": 10,
+    "min_cycles": 1,
+    "must_contain": null,
+    "must_not_contain": null,
+    "dpr": "C:\\Entwicklung\\Delphi Visualizer\\SampleProject\\Scenarios\\impl_cycle\\impl_cycle.dpr"
+  },
+  "self_reference": {
+    "note": "Unit uses itself",
+    "root": "UnitA",
+    "depth": 10,
+    "min_cycles": 1,
+    "must_contain": null,
+    "must_not_contain": null,
+    "dpr": "C:\\Entwicklung\\Delphi Visualizer\\SampleProject\\Scenarios\\self_reference\\self_reference.dpr"
+  },
+  "triangle": {
+    "note": "A -> B -> C -> A",
+    "root": "UnitA",
+    "depth": 10,
+    "min_cycles": 1,
+    "must_contain": null,
+    "must_not_contain": null,
+    "dpr": "C:\\Entwicklung\\Delphi Visualizer\\SampleProject\\Scenarios\\triangle\\triangle.dpr"
+  },
+  "long_ring": {
+    "note": "12 units in one interface ring",
+    "root": "Ring0",
+    "depth": 10,
+    "min_cycles": 1,
+    "must_contain": null,
+    "must_not_contain": null,
+    "dpr": "C:\\Entwicklung\\Delphi Visualizer\\SampleProject\\Scenarios\\long_ring\\long_ring.dpr"
+  },
+  "two_cycles_shared_node": {
+    "note": "Two cycles sharing Core: Core->A->Core and Core->B->C->Core",
+    "root": "Core",
+    "depth": 10,
+    "min_cycles": 2,
+    "must_contain": null,
+    "must_not_contain": null,
+    "dpr": "C:\\Entwicklung\\Delphi Visualizer\\SampleProject\\Scenarios\\two_cycles_shared_node\\two_cycles_shared_node.dpr"
+  },
+  "hub_and_spokes": {
+    "note": "Hub uses 6 spokes, every spoke uses Hub back (6 cycles through one node)",
+    "root": "Hub",
+    "depth": 10,
+    "min_cycles": 6,
+    "must_contain": null,
+    "must_not_contain": null,
+    "dpr": "C:\\Entwicklung\\Delphi Visualizer\\SampleProject\\Scenarios\\hub_and_spokes\\hub_and_spokes.dpr"
+  },
+  "nested_sccs": {
+    "note": "Two separate cycles (A<->B, C<->D) connected by a one-way bridge",
+    "root": "UnitA",
+    "depth": 10,
+    "min_cycles": 2,
+    "must_contain": null,
+    "must_not_contain": null,
+    "dpr": "C:\\Entwicklung\\Delphi Visualizer\\SampleProject\\Scenarios\\nested_sccs\\nested_sccs.dpr"
+  },
+  "case_mismatch": {
+    "note": "uses clauses spell units with different casing than the files/dpr (regression test: edges must not point to non-existent node ids)",
+    "root": "MainForm",
+    "depth": 10,
+    "min_cycles": 1,
+    "must_contain": null,
+    "must_not_contain": null,
+    "dpr": "C:\\Entwicklung\\Delphi Visualizer\\SampleProject\\Scenarios\\case_mismatch\\case_mismatch.dpr"
+  },
+  "depth_order": {
+    "note": "Depth-limit regression: D is reached first via Root->A->C->D (depth 3, cut off) and also via Root->B->D (depth 2). With depth=3 F (child of D) must still be present.",
+    "root": "Root",
+    "depth": 3,
+    "min_cycles": 0,
+    "must_contain": [
+      "UnitF"
+    ],
+    "must_not_contain": null,
+    "dpr": "C:\\Entwicklung\\Delphi Visualizer\\SampleProject\\Scenarios\\depth_order\\depth_order.dpr"
+  },
+  "tricky_syntax": {
+    "note": "Commented-out / string-embedded uses that must NOT create edges, plus a real cycle A<->B",
+    "root": "UnitA",
+    "depth": 10,
+    "min_cycles": 1,
+    "must_contain": null,
+    "must_not_contain": [
+      "Ghost1",
+      "Ghost2",
+      "Ghost3",
+      "Ghost4"
+    ],
+    "dpr": "C:\\Entwicklung\\Delphi Visualizer\\SampleProject\\Scenarios\\tricky_syntax\\tricky_syntax.dpr"
+  }
+}

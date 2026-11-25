@@ -124,5 +124,15 @@
   "nav.lookRight": "Взгляд вправо (→)",
 
   "rotate.title": "Вращение",
-  "rotate.auto": "Автоповорот"
+  "rotate.auto": "Автоповорот",
+
+  "welcome.title": "Добро пожаловать",
+  "welcome.heading": "Добро пожаловать в Delphi Dependency Visualizer",
+  "welcome.text": "Показывает зависимости модулей проекта Delphi в виде интерактивного 3D-графа, включая циклические ссылки. С чего хотите начать?",
+  "welcome.btnOpen": "Открыть проект…",
+  "welcome.btnOpenDesc": "Выберите файл .dpr или экспорт GraphViz (.gv/.dot)",
+  "welcome.btnDemo": "Открыть демо-проект",
+  "welcome.btnDemoDesc": "AcmeERP: около 520 учебных модулей с множеством циклов",
+  "welcome.btnLater": "Позже",
+  "welcome.demoMissing": "Демо-проект не найден."
 }

@@ -124,5 +124,15 @@
   "nav.lookRight": "Look right (→)",
 
   "rotate.title": "Rotate",
-  "rotate.auto": "Auto-rotate"
+  "rotate.auto": "Auto-rotate",
+
+  "welcome.title": "Welcome",
+  "welcome.heading": "Welcome to Delphi Dependency Visualizer",
+  "welcome.text": "Shows the unit dependencies of a Delphi project as an interactive 3D graph, including circular references. How would you like to start?",
+  "welcome.btnOpen": "Open project…",
+  "welcome.btnOpenDesc": "Pick a .dpr file or a GraphViz export (.gv/.dot)",
+  "welcome.btnDemo": "Open demo project",
+  "welcome.btnDemoDesc": "AcmeERP: about 520 sample units with plenty of cycles to explore",
+  "welcome.btnLater": "Later",
+  "welcome.demoMissing": "The demo project could not be found."
 }

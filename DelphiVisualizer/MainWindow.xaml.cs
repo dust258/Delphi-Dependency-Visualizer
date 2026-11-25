@@ -154,6 +154,8 @@ public partial class MainWindow : Window
                 _autoAnalyzeOnReady = false;
                 AnalyzeDependencies(_selectedUnit);
             }
+
+            ShowWelcomeIfFirstStart();
         });
     }
 
@@ -223,7 +225,9 @@ public partial class MainWindow : Window
 
     // ── Project loading ──────────────────────────────────────
 
-    private void BtnOpen_Click(object sender, RoutedEventArgs e)
+    private void BtnOpen_Click(object sender, RoutedEventArgs e) => OpenProjectFromFileDialog();
+
+    private void OpenProjectFromFileDialog()
     {
         var dlg = new Microsoft.Win32.OpenFileDialog
         {
@@ -238,6 +242,28 @@ public partial class MainWindow : Window
         // view (same as session-restore). Uses the pre-selected start unit.
         if (BtnAnalyze.IsEnabled && !string.IsNullOrEmpty(_selectedUnit))
             AnalyzeDependencies(_selectedUnit);
+    }
+
+    // First start (no saved/valid project yet): offer to open a project or the demo.
+    // Skipped under MCP control, where a modal dialog would block the remote caller.
+    private void ShowWelcomeIfFirstStart()
+    {
+        if (!string.IsNullOrEmpty(_currentProjectPath) || _mcp != null) return;
+
+        var dlg = new WelcomeDialog { Owner = this };
+        if (dlg.ShowDialog() != true) return;
+
+        switch (dlg.Choice)
+        {
+            case WelcomeChoice.OpenProject:
+                OpenProjectFromFileDialog();
+                break;
+            case WelcomeChoice.OpenDemo:
+                LoadProject(WelcomeDialog.DemoProjectPath, "fMain");
+                if (BtnAnalyze.IsEnabled && !string.IsNullOrEmpty(_selectedUnit))
+                    AnalyzeDependencies(_selectedUnit);
+                break;
+        }
     }
 
     private void BtnFindUnit_Click(object sender, RoutedEventArgs e)

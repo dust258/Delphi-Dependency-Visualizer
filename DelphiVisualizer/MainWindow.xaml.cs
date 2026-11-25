@@ -49,6 +49,7 @@ public partial class MainWindow : Window
         LocalizationManager.LanguageChanged += OnLanguageChanged;
 
         _ = InitWebViewAsync();
+        StartStartupWatchdog();
         TryRestoreLastSession();
     }
 
@@ -100,21 +101,81 @@ public partial class MainWindow : Window
             // Auto-analyze once the WebView is ready
             _autoAnalyzeOnReady = !string.IsNullOrEmpty(settings.Unit);
         }
-        catch { }
+        catch (Exception ex)
+        {
+            ErrorLog.Write(ex, "Restoring the last session failed");
+            AddLog($"[{DateTime.Now:HH:mm:ss.fff}] Session restore failed: {ex.Message}");
+        }
     }
 
     // ── WebView2 ─────────────────────────────────────────────
 
+    private bool _startupFailed;
+
+    // Startup problems used to fail silently (splash never closing, nothing happening).
+    // Close the splash, log it and tell the user what to do.
+    private void ReportStartupFailure(string message, Exception? ex = null)
+    {
+        ErrorLog.Write(ex != null ? message + "\n" + ex : message);
+        AddLog($"[{DateTime.Now:HH:mm:ss.fff}] Startup failure: {message}");
+        if (_startupFailed) return;
+        _startupFailed = true;
+
+        SplashWindow?.CloseSplash();
+        SplashWindow = null;
+        SetStatus(T("status.loadError"));
+        if (_mcp == null)
+            MessageBox.Show(message, T("errors.title"), MessageBoxButton.OK, MessageBoxImage.Error);
+    }
+
+    private void StartStartupWatchdog()
+    {
+        var timer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(45) };
+        timer.Tick += (_, _) =>
+        {
+            timer.Stop();
+            if (!_webViewReady && !_startupFailed)
+                ReportStartupFailure(T("errors.webviewTimeout", ErrorLog.Path));
+        };
+        timer.Start();
+    }
+
     private async Task InitWebViewAsync()
     {
-        await WebView.EnsureCoreWebView2Async();
+        try
+        {
+            await InitWebViewCoreAsync();
+        }
+        catch (Exception ex)
+        {
+            ReportStartupFailure(T("errors.webviewInit", ex.Message), ex);
+        }
+    }
 
+    private async Task InitWebViewCoreAsync()
+    {
         var webFolder = System.IO.Path.Combine(
             AppDomain.CurrentDomain.BaseDirectory, "Web");
+
+        // Check first: a missing folder would otherwise surface as a misleading
+        // "install WebView2" error from the virtual-host mapping below.
+        if (!System.IO.File.Exists(System.IO.Path.Combine(webFolder, "index.html")))
+        {
+            ReportStartupFailure(T("errors.webFolderMissing", webFolder));
+            return;
+        }
+
+        await WebView.EnsureCoreWebView2Async();
         WebView.CoreWebView2.SetVirtualHostNameToFolderMapping(
             "app.local", webFolder, CoreWebView2HostResourceAccessKind.Allow);
 
         WebView.CoreWebView2.WebMessageReceived += CoreWebView2_WebMessageReceived;
+        WebView.CoreWebView2.ProcessFailed += (_, a) =>
+        {
+            ErrorLog.Write($"WebView2 process failed: {a.ProcessFailedKind}, {a.Reason}, exit code {a.ExitCode}");
+            AddLog($"[{DateTime.Now:HH:mm:ss.fff}] WebView2 process failed: {a.ProcessFailedKind} ({a.Reason})");
+            Dispatcher.InvokeAsync(() => SetStatus(T("status.loadError")));
+        };
         // Route uncaught JS errors / console.error into the log buffer (get_log).
         await WebView.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(@"
 (function(){
@@ -133,7 +194,11 @@ public partial class MainWindow : Window
     private void WebView_NavigationCompleted(object sender,
         CoreWebView2NavigationCompletedEventArgs e)
     {
-        if (!e.IsSuccess) return;
+        if (!e.IsSuccess || e.HttpStatusCode >= 400)
+        {
+            ReportStartupFailure(T("errors.webviewNav", e.WebErrorStatus, e.HttpStatusCode));
+            return;
+        }
 
         Dispatcher.InvokeAsync(async () =>
         {
@@ -303,21 +368,47 @@ public partial class MainWindow : Window
         try
         {
             SetStatus(T("status.loading"));
-            _currentProjectPath = dprPath;
 
+            // Parse into locals first: a failing load must not leave the previous
+            // project half replaced (wrong title, stale unit list).
+            Dictionary<string, ProjectUnit> units;
             var ext = System.IO.Path.GetExtension(dprPath);
-            if (ext.Equals(".gv", StringComparison.OrdinalIgnoreCase) ||
-                ext.Equals(".dot", StringComparison.OrdinalIgnoreCase))
+            var isGraphViz = ext.Equals(".gv", StringComparison.OrdinalIgnoreCase) ||
+                             ext.Equals(".dot", StringComparison.OrdinalIgnoreCase);
+            if (isGraphViz)
             {
                 // Compiler-generated GraphViz export: uses-edges already resolved,
                 // no on-disk file paths to classify Form/DataModule/Frame from.
-                _projectUnits = GraphVizParser.Parse(dprPath);
+                units = GraphVizParser.Parse(dprPath);
             }
             else
             {
-                _projectUnits = DprParser.Parse(dprPath);
-                NodeClassifier.ClassifyAll(_projectUnits);
+                units = DprParser.Parse(dprPath);
+                NodeClassifier.ClassifyAll(units);
             }
+
+            // "Nothing happens" cases: explain why, and keep the previous project
+            // instead of replacing it with an empty one.
+            if (!units.Values.Any(u => u.FileFound))
+            {
+                var explicitUnits = units.Values.Where(u => u.ExplicitPath).ToList();
+                var shown = explicitUnits.Count > 0 ? explicitUnits : units.Values.ToList();
+                var problem = units.Count == 0
+                    ? T("errors.noUnits", System.IO.Path.GetFileName(dprPath))
+                    : T("errors.noFiles", shown.Count,
+                        string.Join("\n", shown.Take(5).Select(u => u.AbsolutePath)));
+
+                _lastError = problem;
+                ErrorLog.Write($"Project could not be used: {dprPath}\n{problem}");
+                AddLog($"[{DateTime.Now:HH:mm:ss.fff}] {problem}");
+                SetStatus(T("status.loadError"));
+                if (_mcp == null)
+                    MessageBox.Show(problem, T("errors.title"), MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            _currentProjectPath = dprPath;
+            _projectUnits = units;
 
             // Only units with a real .pas file are valid analysis roots — skip
             // the pseudo-entries the .dpr parser produces for dotted RTL units
@@ -349,14 +440,26 @@ public partial class MainWindow : Window
             UpdateWindowTitle();
             if (_webViewReady)
                 _ = WebView.ExecuteScriptAsync("clearGraph()");
-            SetStatus(T("status.projectLoaded", _projectUnits.Count, System.IO.Path.GetFileName(dprPath)));
+
+            // Units explicitly named in the .dpr whose file does not exist (RTL units
+            // without a path are expected to be missing and not counted).
+            var missing = _projectUnits.Values.Where(u => !u.FileFound && u.ExplicitPath).ToList();
+            var status = T("status.projectLoaded", _projectUnits.Count, System.IO.Path.GetFileName(dprPath));
+            if (missing.Count > 0)
+            {
+                status += T("status.missingFiles", missing.Count);
+                AddLog($"[{DateTime.Now:HH:mm:ss.fff}] {missing.Count} unit file(s) listed in the project were not found: " +
+                       string.Join(", ", missing.Take(20).Select(u => u.AbsolutePath)));
+            }
+            SetStatus(status);
         }
         catch (Exception ex)
         {
             _lastError = ex.ToString();
+            ErrorLog.Write(ex, $"Loading project failed: {dprPath}");
             AddLog($"[{DateTime.Now:HH:mm:ss.fff}] Load failed: {ex}");
             if (_mcp == null)
-                MessageBox.Show(T("errors.loadFailed", ex.Message),
+                MessageBox.Show(T("errors.loadFailed", $"{dprPath}\n\n{ex.Message}"),
                     T("errors.title"), MessageBoxButton.OK, MessageBoxImage.Error);
             SetStatus(T("status.loadError"));
         }

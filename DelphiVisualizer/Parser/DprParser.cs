@@ -32,6 +32,7 @@ public static class DprParser
             {
                 Name = name,
                 FilePath = relPath,
+                ExplicitPath = m.Groups[2].Success,
                 AbsolutePath = absPath,
                 FileFound = File.Exists(absPath)
             };

@@ -135,5 +135,14 @@
   "welcome.btnDemoDesc": "AcmeERP : environ 520 unités d'exemple avec de nombreux cycles",
   "welcome.btnClose": "Fermer",
   "welcome.showAlways": "Toujours afficher au démarrage",
-  "options.showWelcome": "Afficher la boîte de bienvenue au démarrage"
+  "options.showWelcome": "Afficher la boîte de bienvenue au démarrage",
+
+  "errors.webviewInit": "La vue 3D (Microsoft Edge WebView2) n'a pas pu démarrer.\n\n{0}\n\nVeuillez installer le runtime WebView2 (https://go.microsoft.com/fwlink/p/?LinkId=2124703) et redémarrer l'application.",
+  "errors.webviewNav": "L'interface n'a pas pu être chargée (état : {0}, HTTP {1}).\n\nVérifiez que le dossier 'Web' se trouve à côté de DelphiVisualizer.exe (installation incomplète ?).",
+  "errors.webviewTimeout": "La vue 3D ne répond pas (délai dépassé au démarrage).\n\nVeuillez redémarrer l'application. Si le problème persiste, réinstallez le runtime WebView2 et joignez ce fichier à votre rapport de bogue :\n{0}",
+  "errors.noUnits": "Aucune unité trouvée dans '{0}'.\n\n• .dpr : le programme principal doit avoir une clause uses listant les unités du projet (p. ex. Unit1 in 'Unit1.pas').\n• .gv/.dot : le fichier doit provenir de l'option du compilateur Delphi 12 --graphviz.",
+  "errors.noFiles": "Le fichier projet liste {0} unités, mais aucun de leurs fichiers .pas n'a été trouvé.\n\nRecherché par exemple ici :\n{1}\n\nLes chemins de la clause uses (in '...') sont relatifs au fichier .dpr.",
+  "status.missingFiles": " · {0} fichiers d'unité introuvables",
+  "errors.unhandled": "Une erreur inattendue s'est produite :\n\n{0}\n\nDétails dans :\n{1}",
+  "errors.webFolderMissing": "Les fichiers de l'interface sont introuvables : {0}\n\nL'installation semble incomplète. Veuillez réinstaller l'application."
 }

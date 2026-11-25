@@ -135,5 +135,14 @@
   "welcome.btnDemoDesc": "AcmeERP: about 520 sample units with plenty of cycles to explore",
   "welcome.btnClose": "Close",
   "welcome.showAlways": "Always show at startup",
-  "options.showWelcome": "Show welcome dialog at startup"
+  "options.showWelcome": "Show welcome dialog at startup",
+
+  "errors.webviewInit": "The 3D view (Microsoft Edge WebView2) could not be started.\n\n{0}\n\nPlease install the WebView2 Runtime (https://go.microsoft.com/fwlink/p/?LinkId=2124703) and restart the application.",
+  "errors.webviewNav": "The user interface could not be loaded (status: {0}, HTTP {1}).\n\nCheck that the 'Web' folder exists next to DelphiVisualizer.exe (incomplete installation?).",
+  "errors.webviewTimeout": "The 3D view is not responding (timeout during startup).\n\nPlease restart the application. If the problem persists, reinstall the WebView2 Runtime and attach this file to a bug report:\n{0}",
+  "errors.noUnits": "No units were found in '{0}'.\n\n• .dpr: the main program needs a uses clause listing the project units (e.g. Unit1 in 'Unit1.pas').\n• .gv/.dot: the file must come from the Delphi 12 compiler switch --graphviz.",
+  "errors.noFiles": "The project file lists {0} units, but none of their .pas files could be found.\n\nLooked for example here:\n{1}\n\nPaths in the uses clause (in '...') are relative to the .dpr file.",
+  "status.missingFiles": " · {0} unit files not found",
+  "errors.unhandled": "An unexpected error occurred:\n\n{0}\n\nDetails are in:\n{1}",
+  "errors.webFolderMissing": "The user interface files are missing: {0}\n\nThe installation seems to be incomplete. Please reinstall the application."
 }

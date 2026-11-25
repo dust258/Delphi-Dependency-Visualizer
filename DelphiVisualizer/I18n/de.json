@@ -135,5 +135,14 @@
   "welcome.btnDemoDesc": "AcmeERP: ca. 520 Beispiel-Units mit vielen Zyklen zum Ausprobieren",
   "welcome.btnClose": "Schließen",
   "welcome.showAlways": "Beim Start immer anzeigen",
-  "options.showWelcome": "Willkommensdialog beim Start anzeigen"
+  "options.showWelcome": "Willkommensdialog beim Start anzeigen",
+
+  "errors.webviewInit": "Die 3D-Ansicht (Microsoft Edge WebView2) konnte nicht gestartet werden.\n\n{0}\n\nBitte das WebView2-Runtime installieren (https://go.microsoft.com/fwlink/p/?LinkId=2124703) und die Anwendung neu starten.",
+  "errors.webviewNav": "Die Oberfläche konnte nicht geladen werden (Status: {0}, HTTP {1}).\n\nPrüfe, ob der Ordner 'Web' neben DelphiVisualizer.exe vorhanden ist (Installation unvollständig?).",
+  "errors.webviewTimeout": "Die 3D-Ansicht antwortet nicht (Zeitüberschreitung beim Start).\n\nBitte die Anwendung neu starten. Besteht das Problem weiter, das WebView2-Runtime neu installieren und für einen Fehlerbericht diese Datei beilegen:\n{0}",
+  "errors.noUnits": "In '{0}' wurden keine Units gefunden.\n\n• .dpr: Das Hauptprogramm braucht eine uses-Klausel mit den Projekt-Units (z. B. Unit1 in 'Unit1.pas').\n• .gv/.dot: Die Datei muss aus dem Delphi-12-Compilerschalter --graphviz stammen.",
+  "errors.noFiles": "In der Projektdatei sind {0} Units eingetragen, aber keine zugehörige .pas-Datei wurde gefunden.\n\nGesucht wurde z. B. hier:\n{1}\n\nPfade in der uses-Klausel (in '...') gelten relativ zur .dpr-Datei.",
+  "status.missingFiles": " · {0} Unit-Dateien nicht gefunden",
+  "errors.unhandled": "Es ist ein unerwarteter Fehler aufgetreten:\n\n{0}\n\nDetails stehen in:\n{1}",
+  "errors.webFolderMissing": "Die Dateien der Oberfläche fehlen: {0}\n\nDie Installation scheint unvollständig zu sein. Bitte das Programm neu installieren."
 }

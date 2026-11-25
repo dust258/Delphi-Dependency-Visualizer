@@ -8,9 +8,17 @@ public partial class App : Application
     private void OnStartup(object sender, StartupEventArgs e)
     {
         AppDomain.CurrentDomain.UnhandledException += (s, ex) =>
-            LogCrash(ex.ExceptionObject as Exception);
+        {
+            ErrorLog.Write(ex.ExceptionObject as Exception ?? new Exception(ex.ExceptionObject?.ToString()),
+                "Unhandled exception (terminating)");
+            ShowUnexpectedError(ex.ExceptionObject as Exception);
+        };
         DispatcherUnhandledException += (s, ex) =>
-        { LogCrash(ex.Exception); ex.Handled = true; };
+        {
+            ErrorLog.Write(ex.Exception, "Unhandled UI exception");
+            ex.Handled = true;
+            ShowUnexpectedError(ex.Exception);
+        };
 
         var savedLang = TryReadSavedLanguage();
         LocalizationManager.Boot(savedLang);
@@ -40,17 +48,24 @@ public partial class App : Application
         return int.TryParse(value, out var p) && p > 1024 && p < 65536 ? p : McpServer.DefaultPort;
     }
 
-    private static void LogCrash(Exception? ex)
+    private static bool _showingError;
+
+    // Previously exceptions were swallowed (handled, nothing shown) or written to a
+    // file on the Desktop. Tell the user, and point to the log for bug reports.
+    private static void ShowUnexpectedError(Exception? ex)
     {
+        if (_showingError) return; // avoid a storm of dialogs from a repeating error
+        _showingError = true;
         try
         {
-            var path = System.IO.Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                "DelphiVisualizer-crash.txt");
-            System.IO.File.WriteAllText(path,
-                $"{DateTime.Now}\n{ex?.GetType().FullName}\n{ex?.Message}\n{ex?.StackTrace}\n\nInner: {ex?.InnerException}");
+            var text = L.T("errors.unhandled", ex?.Message ?? "?", ErrorLog.Path);
+            if (text.StartsWith("errors."))   // language not loaded yet
+                text = $"An unexpected error occurred:\n\n{ex?.Message}\n\nDetails: {ErrorLog.Path}";
+            MessageBox.Show(text, "Delphi Dependency Visualizer",
+                MessageBoxButton.OK, MessageBoxImage.Error);
         }
         catch { }
+        finally { _showingError = false; }
     }
 
     private static string? TryReadSavedLanguage()

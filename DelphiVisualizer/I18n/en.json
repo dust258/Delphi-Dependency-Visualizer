@@ -133,6 +133,7 @@
   "welcome.btnOpenDesc": "Pick a .dpr file or a GraphViz export (.gv/.dot)",
   "welcome.btnDemo": "Open demo project",
   "welcome.btnDemoDesc": "AcmeERP: about 520 sample units with plenty of cycles to explore",
-  "welcome.btnLater": "Later",
-  "welcome.demoMissing": "The demo project could not be found."
+  "welcome.btnClose": "Close",
+  "welcome.showAlways": "Always show at startup",
+  "options.showWelcome": "Show welcome dialog at startup"
 }

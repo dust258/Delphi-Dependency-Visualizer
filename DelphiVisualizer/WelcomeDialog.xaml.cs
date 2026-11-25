@@ -14,9 +14,13 @@ public partial class WelcomeDialog : Window
 
     public WelcomeChoice Choice { get; private set; } = WelcomeChoice.None;
 
-    public WelcomeDialog()
+    // Whether the dialog should appear on every start (the checkbox state).
+    public bool ShowAlways => CbShowAlways.IsChecked == true;
+
+    public WelcomeDialog(bool showAlways = true)
     {
         InitializeComponent();
+        CbShowAlways.IsChecked = showAlways;
         NativeMethods.EnableDarkTitleBar(this);
         Icon = AppIconHelper.Get();
         BtnDemo.IsEnabled = File.Exists(DemoProjectPath);
@@ -34,7 +38,7 @@ public partial class WelcomeDialog : Window
         DialogResult = true;
     }
 
-    private void BtnLater_Click(object sender, RoutedEventArgs e)
+    private void BtnClose_Click(object sender, RoutedEventArgs e)
     {
         DialogResult = false;
     }

@@ -15,6 +15,8 @@
       <RowDefinition Height="12"/>
       <RowDefinition Height="Auto"/>
       <RowDefinition Height="Auto"/>
+      <RowDefinition Height="12"/>
+      <RowDefinition Height="Auto"/>
       <RowDefinition Height="20"/>
       <RowDefinition Height="Auto"/>
     </Grid.RowDefinitions>
@@ -79,8 +81,16 @@
       </Grid>
     </Border>
 
+    <!-- Willkommensdialog -->
+    <Border Grid.Row="6"
+            Background="#080C18" BorderBrush="#1E2D50" BorderThickness="1"
+            CornerRadius="6" Padding="14,12">
+      <CheckBox x:Name="CbShowWelcome" Content="{s:L options.showWelcome}"
+                Foreground="#E0E6F0" FontSize="12" VerticalContentAlignment="Center"/>
+    </Border>
+
     <!-- Buttons -->
-    <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right">
+    <StackPanel Grid.Row="8" Orientation="Horizontal" HorizontalAlignment="Right">
       <Button Content="{s:L options.btnCancel}" Style="{StaticResource LayoutButton}"
               Width="90" Height="30" Margin="0,0,8,0"
               Click="BtnCancel_Click"/>

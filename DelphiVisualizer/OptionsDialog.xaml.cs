@@ -10,10 +10,13 @@ public partial class OptionsDialog : Window
 {
     public int    MaxNodes { get; private set; }
     public string Language { get; private set; } = LocalizationManager.CurrentLanguage;
+    public bool   ShowWelcome { get; private set; }
 
-    public OptionsDialog(int currentMaxNodes)
+    public OptionsDialog(int currentMaxNodes, bool showWelcome)
     {
         InitializeComponent();
+        ShowWelcome = showWelcome;
+        CbShowWelcome.IsChecked = showWelcome;
         NativeMethods.EnableDarkTitleBar(this);
         Icon = AppIconHelper.Get();
         MaxNodes = currentMaxNodes;
@@ -42,6 +45,7 @@ public partial class OptionsDialog : Window
         if (int.TryParse(TbMaxNodes.Text, out var n) && n >= 100)
         {
             MaxNodes = n;
+            ShowWelcome = CbShowWelcome.IsChecked == true;
             Language = (CbLanguage.SelectedItem as ComboBoxItem)?.Tag as string
                        ?? LocalizationManager.CurrentLanguage;
             DialogResult = true;

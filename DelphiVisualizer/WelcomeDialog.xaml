@@ -38,8 +38,16 @@
       </StackPanel>
     </Button>
 
-    <Button Content="{s:L welcome.btnLater}" Style="{StaticResource LayoutButton}"
-            Width="90" Height="30" Margin="0,20,0,0" HorizontalAlignment="Right"
-            Click="BtnLater_Click" IsCancel="True"/>
+    <Grid Margin="0,20,0,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
+      <CheckBox x:Name="CbShowAlways" Grid.Column="0" VerticalAlignment="Center"
+                Content="{s:L welcome.showAlways}"
+                Foreground="#8899BB" FontSize="11"/>
+      <Button Grid.Column="1" Content="{s:L welcome.btnClose}" Style="{StaticResource LayoutButton}"
+              Width="90" Height="30" Click="BtnClose_Click" IsCancel="True"/>
+    </Grid>
   </StackPanel>
 </Window>

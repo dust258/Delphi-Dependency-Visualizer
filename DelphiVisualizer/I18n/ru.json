@@ -133,6 +133,7 @@
   "welcome.btnOpenDesc": "Выберите файл .dpr или экспорт GraphViz (.gv/.dot)",
   "welcome.btnDemo": "Открыть демо-проект",
   "welcome.btnDemoDesc": "AcmeERP: около 520 учебных модулей с множеством циклов",
-  "welcome.btnLater": "Позже",
-  "welcome.demoMissing": "Демо-проект не найден."
+  "welcome.btnClose": "Закрыть",
+  "welcome.showAlways": "Всегда показывать при запуске",
+  "options.showWelcome": "Показывать окно приветствия при запуске"
 }

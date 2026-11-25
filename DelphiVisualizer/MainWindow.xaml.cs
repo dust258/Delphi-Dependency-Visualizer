@@ -54,23 +54,24 @@ public partial class MainWindow : Window
 
     // ── Settings persistence ─────────────────────────────────
 
-    private record AppSettings(string ProjectPath, string Unit, int Depth, int MaxNodes = 20000, string Language = "de");
+    private record AppSettings(string ProjectPath, string Unit, int Depth, int MaxNodes = 20000, string Language = "de", bool ShowWelcome = true);
 
     // Für LocalizationManager.NotifyWebViewAsync
     public bool IsWebViewReady => _webViewReady;
 
     public SplashWindow? SplashWindow { get; set; }
 
+    private bool _showWelcome = true;
+
     private void SaveSettings()
     {
         try
         {
-            if (string.IsNullOrEmpty(_currentProjectPath)) return;
             var dir = System.IO.Path.GetDirectoryName(SettingsPath)!;
             System.IO.Directory.CreateDirectory(dir);
             var settings = new AppSettings(
-                _currentProjectPath, _selectedUnit, (int)SlDepth.Value, _maxNodes,
-                LocalizationManager.CurrentLanguage);
+                _currentProjectPath ?? "", _selectedUnit, (int)SlDepth.Value, _maxNodes,
+                LocalizationManager.CurrentLanguage, _showWelcome);
             System.IO.File.WriteAllText(SettingsPath,
                 JsonSerializer.Serialize(settings));
         }
@@ -84,7 +85,12 @@ public partial class MainWindow : Window
             if (!System.IO.File.Exists(SettingsPath)) return;
             var settings = JsonSerializer.Deserialize<AppSettings>(
                 System.IO.File.ReadAllText(SettingsPath));
-            if (settings == null || !System.IO.File.Exists(settings.ProjectPath))
+            if (settings == null) return;
+
+            // Read independently of the project so it also works without one.
+            _showWelcome = settings.ShowWelcome;
+
+            if (string.IsNullOrEmpty(settings.ProjectPath) || !System.IO.File.Exists(settings.ProjectPath))
                 return;
 
             SlDepth.Value = settings.Depth > 0 ? settings.Depth : 3;
@@ -148,14 +154,14 @@ public partial class MainWindow : Window
                 _pendingGraphJson = null;
                 SendGraphToWebView(json);
             }
-            // Auto-analyze the restored session once everything is ready
-            if (_autoAnalyzeOnReady && !string.IsNullOrEmpty(_selectedUnit))
-            {
-                _autoAnalyzeOnReady = false;
-                AnalyzeDependencies(_selectedUnit);
-            }
+            // Welcome dialog first: if the user picks a project there, it
+            // replaces the restored session (no auto-analyze of the old one).
+            var openedSomething = ShowWelcomeDialog();
 
-            ShowWelcomeIfFirstStart();
+            // Auto-analyze the restored session once everything is ready
+            if (_autoAnalyzeOnReady && !openedSomething && !string.IsNullOrEmpty(_selectedUnit))
+                AnalyzeDependencies(_selectedUnit);
+            _autoAnalyzeOnReady = false;
         });
     }
 
@@ -244,25 +250,35 @@ public partial class MainWindow : Window
             AnalyzeDependencies(_selectedUnit);
     }
 
-    // First start (no saved/valid project yet): offer to open a project or the demo.
-    // Skipped under MCP control, where a modal dialog would block the remote caller.
-    private void ShowWelcomeIfFirstStart()
+    // Shown on every start unless switched off ("show always" checkbox here or in
+    // the options). Skipped under MCP control, where a modal dialog would block the
+    // remote caller. Returns true if the user chose to open a project/demo.
+    private bool ShowWelcomeDialog()
     {
-        if (!string.IsNullOrEmpty(_currentProjectPath) || _mcp != null) return;
+        if (!_showWelcome || _mcp != null) return false;
 
-        var dlg = new WelcomeDialog { Owner = this };
-        if (dlg.ShowDialog() != true) return;
+        var dlg = new WelcomeDialog(_showWelcome) { Owner = this };
+        dlg.ShowDialog();
+
+        if (dlg.ShowAlways != _showWelcome)
+        {
+            _showWelcome = dlg.ShowAlways;
+            SaveSettings();
+        }
 
         switch (dlg.Choice)
         {
             case WelcomeChoice.OpenProject:
+                var before = _currentProjectPath;
                 OpenProjectFromFileDialog();
-                break;
+                return _currentProjectPath != before;
             case WelcomeChoice.OpenDemo:
                 LoadProject(WelcomeDialog.DemoProjectPath, "fMain");
                 if (BtnAnalyze.IsEnabled && !string.IsNullOrEmpty(_selectedUnit))
                     AnalyzeDependencies(_selectedUnit);
-                break;
+                return true;
+            default:
+                return false;
         }
     }
 
@@ -913,9 +929,10 @@ public partial class MainWindow : Window
 
     private void BtnOptions_Click(object sender, RoutedEventArgs e)
     {
-        var dlg = new OptionsDialog(_maxNodes) { Owner = this };
+        var dlg = new OptionsDialog(_maxNodes, _showWelcome) { Owner = this };
         if (dlg.ShowDialog() != true) return;
         _maxNodes = dlg.MaxNodes;
+        _showWelcome = dlg.ShowWelcome;
         if (dlg.Language != LocalizationManager.CurrentLanguage)
             LocalizationManager.SetLanguage(dlg.Language);
         SaveSettings();

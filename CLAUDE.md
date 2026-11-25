@@ -90,7 +90,6 @@ Startunit: `val * 125` (≈5× größerer Radius), `nodeVal`-Cap für andere Kno
 
 - Settings: `%APPDATA%\DelphiVisualizer\settings.json` (ProjectPath, Unit, Depth)
 - Auto-Load beim Start: `TryRestoreLastSession` + `_autoAnalyzeOnReady`
-- Test-Projekt (extern): `C:\Entwicklung\Delphi\lx_pdl\Programm\LCSAueg.dpr`, Unit `u_FormInformation`
 - Beispielprojekt (mitgeliefert): `SampleProject/AcmeERP/` — ~523 synthetische Units
   (50 Feature-Module à 10 Units), Mega-Hub `fMain`, ~69 Zyklen. `uAppContext` (interface
   `uses fMain`) wird von jedem Formular benutzt → `fMain` + alle Formulare bilden eine
